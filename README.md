@@ -1,6 +1,6 @@
 # CNN Classifier
 
-This project requires the implementation of an image classifier based on convo lutional neural networks. The provided dataset (from [Lazebnik et al., 2006]), contains 15 categories (office, kitchen, living room, bedroom, store, industrial, tall building, inside city, street, highway, coast, open country, mountain, forest, suburb), and is already divided in training set and test set.
+This project requires the implementation of an image classifier based on convolutional neural networks. The provided dataset (from [Lazebnik et al., 2006]), contains 15 categories (office, kitchen, living room, bedroom, store, industrial, tall building, inside city, street, highway, coast, open country, mountain, forest, suburb), and is already divided in training set and test set.
 
 | # | type | size |
 |---|------|------|
@@ -19,9 +19,9 @@ This project requires the implementation of an image classifier based on convo l
 
 You are required to:
 
-1. train a shallow network from scratch according to the following specifications:
+### 1. Train a shallow network from scratch according to the following specifications
 
-+ use the network layout shown in Table 1:
++ use the network layout shown in Table;
 + since the input image is 64×64 you will need to resize the images in order to feed them to the network; follow the simple approach of rescaling the whole image independently along x and y to get the proper size (an example of such anisotropic rescaling is shown in Fig. 3)). Other approaches exist, see below about the optional improvement of data augmentation;
 + split the provided training set in 85% for actual training set and 15% to be used as validation set;
 + employ the stochastic gradient descent with momentum optimization algorithm, using the default parameters of the library you use, except for those specified in the following;
@@ -31,7 +31,9 @@ You are required to:
 + comment on the criterion you choose for stopping the training;
 + report the confusion matrix and the overall accuracy, both computed on the test set.
 
-2. Improve the previous result, according to the following suggestions (not all the following will necessarily result in an increase of accuracy, but you should be able to obtain a test accuracy of about 60% by employing some of them):
+### 2. Improve the previous result
+
+According to the following suggestions (not all the following will necessarily result in an increase of accuracy, but you should be able to obtain a test accuracy of about 60% by employing some of them):
 
 + data augmentation: given the small training set, data augmentation is likely to improve the performance. For the problem at hand, left-to-right reflections are a reasonable augmentation technique. By augmenting the train data using left-to-right reflections you should get an accuracy of about 40%;
 + batch normalization [Ioffe and Szegedy, 2015]: add batch normalization layers before the reLU layers;
@@ -42,9 +44,13 @@ You are required to:
 
 Comment on any significant change you notice after the application of the previous modifications.
 
-3. Use transfer learning based on a pre-trained network, for instance AlexNet [Krizhevsky et al., 2012], in the following two manners (in both of the cases you should get a test accuracy above 85%):
+### 3. Use transfer learning based on a pre-trained network 
+
+For instance AlexNet [Krizhevsky et al., 2012], in the following two manners (in both of the cases you should get a test accuracy above 85%):
 
 + employ the pre-trained network as a feature extractor, accessing the activation of an intermediate layer (for instance the last convolutional layer) and train a multiclass linear SVM. For implementing the multiclass SVM use any of the approaches seen in the lectures, for instance DAG.
+
+### Optional tasks
 
 4. Optionally, in tasks 2 and 3, you could improve data augmentation, adding to the left-right reflection a random cropping of a sufficiently large region, followed by small rotations and rescaling (an example of crop and rescaling is shown in Fig. 3);
 5. optionally, in task 2, you could add more convolutional and/or fullyconnected layers;
