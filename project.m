@@ -47,7 +47,7 @@ layers = [
 
 lgraph = layerGraph(layers); % to run the layers need a name
 analyzeNetwork(lgraph)
-InitialLearningRate = 0.001;
+InitialLearningRate = 0.0015;
 options = trainingOptions('sgdm', ...
     'InitialLearnRate', InitialLearningRate, ...
     'ValidationData',imdsValidation, ... 
@@ -58,7 +58,19 @@ options = trainingOptions('sgdm', ...
 );
 
 net = trainNetwork(imdsTrain,layers,options);
-net = trainNetwork(imdsTrain,layers,options);
-net = trainNetwork(imdsTrain,layers,options);
-net = trainNetwork(imdsTrain,layers,options);
-net = trainNetwork(imdsTrain,layers,options);
+
+TestDatasetPath = fullfile('dataset','test');
+imdsTest = imageDatastore(TestDatasetPath, ...
+    'IncludeSubfolders',true,'LabelSource','foldernames');
+imdsTest.ReadFcn = @(x)imresize(imread(x),[64 64]);
+
+% apply the network to the test set
+YPredicted = classify(net,imdsTest);
+YTest = imdsTest.Labels;
+
+% overall accuracy
+accuracy = sum(YPredicted == YTest)/numel(YTest);
+
+% confusion matrix
+figure
+plotconfusion(YTest,YPredicted)

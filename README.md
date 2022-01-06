@@ -26,7 +26,7 @@ You are required to:
 + split the provided training set in 85% for actual training set and 15% to be used as validation set;
 + employ the stochastic gradient descent with momentum optimization algorithm, using the default parameters of the library you use, except for those specified in the following;
 + use minibatches of size 32 and initial weights drawn from a Gaussian distribution with a mean of 0 and a standard deviation of 0.01; set the initial bias values to 0;
-+ by using a proper value for the learning rate, you should be able to obtain an overall test accuracy of around 30% 2;
++ by using a proper value for the learning rate, you should be able to obtain an overall test accuracy of around 30%;
 + report and discuss the plots of loss and accuracy during training, for both the training set and the validation set;
 + comment on the criterion you choose for stopping the training;
 + report the confusion matrix and the overall accuracy, both computed on the test set.
