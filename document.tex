@@ -1,0 +1,175 @@
+\documentclass[a4paper, 11pt, twocolumn]{article} % Font encoding and italian language support
+\usepackage[T1]{fontenc} 
+\usepackage[utf8]{inputenc}
+\usepackage{charter}
+\usepackage[libertine]{newtxmath}
+%\usepackage[italian]{babel}
+
+\usepackage{graphicx} % Manage pictures
+\usepackage[pdfa]{hyperref} % Reference Links
+
+
+
+\usepackage{color} % Allows defining colors for code snippets
+\usepackage{setspace} % Sets leading
+\usepackage[a4paper, inner=0.5cm, outer=0.5cm, lmargin=2cm, rmargin=2cm, tmargin=2.5cm, bmargin=2cm]{geometry} % Sets margins and borders
+
+\usepackage{listings}
+\definecolor{dkgreen}{rgb}{0.1,0.5,0.1}
+\definecolor{greengray}{rgb}{0.32,0.57,0.32}
+\definecolor{orange}{rgb}{0.96,0.42,0}
+\definecolor{lightblue}{rgb}{0,0.28,0.95}
+\definecolor{background}{rgb}{0.995,0.995,0.995}
+\lstset {
+        frame=tb,
+        language=matlab,
+        aboveskip=3mm,
+        belowskip=3mm,
+        showstringspaces=false,
+        columns=flexible,
+        basicstyle={\small\ttfamily},
+        numbers=none,
+        backgroundcolor=\color{background},
+        numberstyle=\tiny\color{drkgeen},
+        keywordstyle=\color{lightblue},
+        commentstyle=\color{greengray},
+        stringstyle=\color{orange},
+        breaklines=true,
+        breakatwhitespace=true,
+        tabsize=3
+}
+
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+\setstretch{1.2} % Sets leading to 1.5
+
+
+\title{CNN Classifier}
+\author{Giovanni Battilana, Marzia Paschini, Marco Sgobino}
+\maketitle
+\tableofcontents % Prints table of contents
+%\newpage
+%\clearpage
+
+\section{Assignment general description}
+
+This project requires the implementation of an image classifier based on convolutional neural networks. The provided dataset (from [Lazebnik et al., 2006]), contains 15 categories (office, kitchen, living room, bedroom, store, industrial, tall building, inside city, street, highway, coast, open country, mountain, forest, suburb), and is already divided in training set and test set.
+
+
+\section{Goal of this paper}
+
+This paper had 3 goals of increasing difficulty:
+
+\begin{enumerate}
+    \item building a \emph{shallow network} with a layout specified from the Teacher in order to have a \emph{baseline} network to allow further comparisons. Such baseline should be improved in the subsequent sections;
+    \item improving the previous baseline network and compare results with the baseline. Comments on strategies adopted should be provided;
+    \item adopting \emph{transfer learning} based on the pre-trained network \emph{AlexNet}.
+\end{enumerate}
+
+\section{Adopted tools}
+
+Students adopted the programming language and numeric computing environment \textbf{MATLAB} as both text editor and simulation software to describe, implement and build the trained networks. 
+
+Specific MATLAB Toolbox were needed \--- the project should require \emph{Deep Learning Toolbox}, \emph{Computer Vision Toolbox} and \emph{Image Processing Toolbox}. Optionally, to improve processing speed during the convolutional neural network build phase, students installed and enabled the \emph{Parallel Computing Toolbox}.
+
+
+
+
+
+
+\section{Training a baseline network}
+
+The first step was the building a baseline network (a shallow network), whose layout had been assigned by the teacher. In practice, this phase required to strictly follow given requirements in order to obtain \emph{an overall test accuracy of around} $30\%$.
+
+\subsection{Importing the dataset} 
+
+The dataset comprises $1500$ images, of 15 categories (office, kitchen, living room, bedroom, store, industrial, tall building, inside city, street, highway, coast, open country, mountain, forest, suburb). Each photo lies inside a directory, whose name denotes the category.
+
+In order to import the dataset into an \emph{image datastore} object, students used following instructions,
+
+\begin{lstlisting}
+TrainDatasetPath = fullfile('dataset', 'train');
+
+imds = imageDatastore(TrainDatasetPath, ...
+    'IncludeSubfolders', true,...
+    'LabelSource', 'foldernames');
+\end{lstlisting}
+
+Each image in the dataset had its own \--- non common \--- size. Moreover, images do not share a common aspect ratio. In order to obtain a shared size and aspect ratio, students have chosen to follow the simple approach of \emph{rescaling the whole image independently along the vertical and the horizontal axis}, in order to achieve the proper size. As will be shown later, the chosen aspect ratio will be $1:1$ (a square).
+
+\subsection{Requirements}
+Layout of the network is described in the following Table:
+\bigskip
+
+\begin{footnotesize}
+\begin{tabular}{|c|c|c|}
+\hline 
+\# & type & size \\
+\hline \hline 
+1 & Image input & $64 \times 64 \times 1$ images \\
+\hline 
+2 & Convolution & $8 \mbox{ } 3 \times 3$ convolutions, stride 1 \\
+\hline 
+3 & ReLU &  \\
+\hline 
+4 & Max Pooling & $2 \times 2$ max pooling, stride 2 \\
+\hline
+5 & Convolution & $16 \mbox{ } 3 \times 3$ convolutions, stride 1 \\
+\hline 
+6 & ReLU &  \\
+\hline 
+7 & Max Pooling & $2 \times 2$ max pooling, stride 2 \\
+\hline
+8 & Convolution & $32 \mbox{ } 3 \times 3$ convolutions, stride 1 \\
+\hline 
+9 & ReLU & \\
+\hline 
+10 & Fully Connected & $15$ \\
+\hline
+11 & Softmax & softmax \\ 
+\hline \hline 
+12 & Classification & crossentropyex \\
+\hline
+\end{tabular}
+\end{footnotesize}
+\bigskip
+
+Other non-optional requirements were the following ones,
+
+\begin{itemize}
+    \item using input images of size $64 \times 64$ (as shown in layer $1$ of previous Table);
+    \item use $85\%$ of the provided dataset for the training set and the remaining portion for the validation set, so that each label is properly split with the same percentage;
+    \item employ \textbf{stochastic gradient descent with momentum} as the optimization algorithm;
+    \item adopt \emph{minibatches} of size $32$;
+    \item choose a stopping criterion;
+\end{itemize}
+
+\subsection{Splitting the dataset}
+
+To split the dataset as requested, students wrote and ran the following code:
+
+\begin{lstlisting}
+trainQuota=0.85;
+[imdsTrain, imdsValidation] = splitEachLabel(imds, trainQuota,...
+    'randomize');
+\end{lstlisting}
+
+These instructions were sufficient to obtain two, distinct, datasets \--- the first one for training, the second one for validation. Images are elected and put in the datasets according to a random process; despite that, \texttt{splitEachLabel} function assured that the same quota of $0.85$ for training sets was maintained across all $15$ labels.
+
+\subsection{Resizing images}
+
+In order to resize images to match the requested size of $64 \times 64$, students ran:
+
+\begin{lstlisting} 
+imds.ReadFcn = @(x)imresize(imread(x),...
+                            [64 64]);
+\end{lstlisting}
+
+\section{Improving the network}
+
+\section{Adopting transfer learning with AlexNet}
+
+
+\end{document}
