@@ -1,0 +1,68 @@
+\documentclass[a4paper, 11pt, twocolumn]{article} % Font encoding and italian language support
+\usepackage[a-1b]{pdfx}
+\usepackage[T1]{fontenc} 
+\usepackage[utf8]{inputenc}
+%\usepackage[italian]{babel}
+
+\usepackage{graphicx} % Manage pictures
+\usepackage[pdfa]{hyperref} % Reference Links
+\usepackage{charter} % Times serif font
+\usepackage[libertine]{newtxmath}      
+\usepackage{setspace} \setstretch{1.25}
+
+
+
+\usepackage{color} % Allows defining colors for code snippets
+\usepackage{setspace} % Sets leading
+\usepackage[a4paper, inner=0.5cm, outer=0.5cm, lmargin=2cm, rmargin=2cm, tmargin=2.5cm, bmargin=2cm]{geometry} % Sets margins and borders
+
+\usepackage{listings}
+\definecolor{dkgreen}{rgb}{0.1,0.5,0.1}
+\definecolor{greengray}{rgb}{0.32,0.57,0.32}
+\definecolor{orange}{rgb}{0.96,0.42,0}
+\definecolor{lightblue}{rgb}{0,0.28,0.95}
+\definecolor{background}{rgb}{0.995,0.995,0.995}
+\lstset {
+        frame=tb,
+        language=matlab,
+        aboveskip=3mm,
+        belowskip=3mm,
+        showstringspaces=false,
+        columns=flexible,
+        basicstyle={\small\ttfamily},
+        numbers=none,
+        backgroundcolor=\color{background},
+        numberstyle=\tiny\color{drkgeen},
+        keywordstyle=\color{lightblue},
+        commentstyle=\color{greengray},
+        stringstyle=\color{orange},
+        breaklines=true,
+        breakatwhitespace=true,
+        tabsize=3
+}
+
+\setlength{\parindent}{28.35pt}
+
+\begin{document}
+
+\title{CNN Classifier}
+\author{Various}
+\maketitle
+\tableofcontents % Prints table of contents
+\newpage
+\clearpage
+
+\section{Problem statement}
+
+\section{Goal of this paper}
+
+This paper has 3 goals of increasing difficulty:
+
+\begin{enumerate}
+    \item build a \emph{shallow network} with specified layout in order to have a \emph{baseline} to make comparisons,
+    \item improve the aforementioned shallow network and compare it with the baseline;
+    \item adopt \emph{transfer learning} based on a pre-trained network such as \emph{AlexNet}.
+\end{enumerate}
+
+
+\end{document}
