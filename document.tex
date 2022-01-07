@@ -1,4 +1,4 @@
-\documentclass[a4paper, 11pt, twocolumn]{article} % Font encoding and italian language support
+\documentclass[a4paper, 11pt]{article} % Font encoding and italian language support
 \usepackage[T1]{fontenc} 
 \usepackage[utf8]{inputenc}
 \usepackage{charter}
@@ -12,7 +12,7 @@
 
 \usepackage{color} % Allows defining colors for code snippets
 \usepackage{setspace} % Sets leading
-\usepackage[a4paper, inner=0.5cm, outer=0.5cm, lmargin=1.5cm, rmargin=1.5cm, tmargin=2cm, bmargin=2cm]{geometry} % Sets margins and borders
+\usepackage[a4paper, inner=0.5cm, outer=0.5cm, lmargin=2cm, rmargin=2cm, tmargin=2.5cm, bmargin=2.5cm]{geometry} % Sets margins and borders
 
 \usepackage{listings}
 \definecolor{dkgreen}{rgb}{0.1,0.5,0.1}
@@ -43,7 +43,7 @@
 
 \begin{document}
 
-\setstretch{1.2} % Sets leading to 1.5
+\setstretch{1.25} % Sets leading to 1.5
 
 
 \title{CNN Classifier}
@@ -91,19 +91,16 @@ In order to import the dataset into an \emph{image datastore} object, students u
 
 \begin{lstlisting}
 TrainDatasetPath = fullfile('dataset', 'train');
-
-imds = imageDatastore(TrainDatasetPath, ...
-    'IncludeSubfolders', true,...
-    'LabelSource', 'foldernames');
+imds = imageDatastore(TrainDatasetPath, 'IncludeSubfolders', true, 'LabelSource', 'foldernames');
 \end{lstlisting}
 
-Each image in the dataset had its own \--- non common \--- size. Moreover, images do not share a common aspect ratio. In order to obtain a shared size and aspect ratio, students have chosen to follow the simple approach of \emph{rescaling the whole image independently along the vertical and the horizontal axis}, in order to achieve the proper size. As will be shown later, the chosen aspect ratio will be $1:1$ (a square).
+Each image in the dataset had its own \--- non common \--- size. Moreover, images do not share a common aspect ratio. In order to obtain a shared size and aspect ratio, the group has chosen to follow the simple approach of \emph{rescaling the whole image independently along the vertical and the horizontal axis}, in order to achieve the proper size. As will be shown later, the chosen aspect ratio will be $1:1$ (a square).
 
 \subsection{Requirements}
 Layout of the network is described in the following Table:
 \bigskip
 
-\begin{footnotesize}
+\begin{center}
 \begin{tabular}{|c|c|c|}
 \hline 
 \# & type & size \\
@@ -133,7 +130,7 @@ Layout of the network is described in the following Table:
 12 & Classification & crossentropyex \\
 \hline
 \end{tabular}
-\end{footnotesize}
+\end{center}
 \bigskip
 
 Other non-optional requirements were the following ones,
@@ -153,8 +150,7 @@ To split the dataset as requested, students wrote and ran the following code:
 
 \begin{lstlisting}
 trainQuota=0.85;
-[imdsTrain, imdsValidation] = splitEachLabel(imds, trainQuota,...
-    'randomize');
+[imdsTrain, imdsValidation] = splitEachLabel(imds, trainQuota, 'randomize');
 \end{lstlisting}
 
 These instructions were sufficient to obtain two, distinct, datasets \--- the first one for training, the second one for validation. Images should be elected and put in the datasets according to a random process; despite that, \texttt{splitEachLabel} function should assure that the same quota of $0.85$ for training sets was maintained across all $15$ labels.
@@ -164,8 +160,7 @@ These instructions were sufficient to obtain two, distinct, datasets \--- the fi
 In order to resize images to match the requested size of $64 \times 64$, students ran:
 
 \begin{lstlisting} 
-imds.ReadFcn = @(x)imresize(imread(x),...
-                            [64 64]);
+imds.ReadFcn = @(x)imresize(imread(x), [64 64]);
 \end{lstlisting}
 
 This command should overload the \texttt{ReadFcn} function inside \texttt{imds}, so that instead of simply reading images they should be resized too.
@@ -178,51 +173,34 @@ Layers layout is specified in the provided Table. In order to obtain such layout
 layers = [
     imageInputLayer([64 64 1],'Name','input')
     
-    convolution2dLayer(3,8,...
-        'Padding','same',...
-        'Stride', [1 1],...
-        'Name','conv_1',...
-        'WeightsInitializer',...
-        @(sz) randn(sz)*0.01,...
-        'BiasInitializer',...
-        @(sz) zeros(sz))
+    convolution2dLayer(3,8, 'Padding','same', 'Stride', [1 1], 'Name','conv_1',...
+        'WeightsInitializer', @(sz) randn(sz)*0.01,...
+        'BiasInitializer', @(sz) zeros(sz))
 
     reluLayer('Name','relu_1')
 
     maxPooling2dLayer(2,'Stride',2,...
         'Name','maxpool_1')
 
-    convolution2dLayer(3,16,...
-        'Padding','same',...
-        'Stride', [1 1],...
-        'Name','conv_2',...
-        'WeightsInitializer',...
-        @(sz) randn(sz)*0.01,...
-        'BiasInitializer',...
-        @(sz) zeros(sz))
+    convolution2dLayer(3,16, 'Padding','same', 'Stride', [1 1], 'Name','conv_2',...
+        'WeightsInitializer', @(sz) randn(sz)*0.01,...
+        'BiasInitializer', @(sz) zeros(sz))
 
     reluLayer('Name','relu_2')
 
     maxPooling2dLayer(2,'Stride',2,...
         'Name','maxpool_2')
 
-    convolution2dLayer(3,32,...
-        'Padding','same',...
-        'Stride', [1 1],...
+    convolution2dLayer(3,32, 'Padding','same', 'Stride', [1 1],...
         'Name','conv_3',...
-        'WeightsInitializer',...
-        @(sz) randn(sz)*0.01,...
-        'BiasInitializer',...
-        @(sz) zeros(sz))
+        'WeightsInitializer', @(sz) randn(sz)*0.01,...
+        'BiasInitializer', @(sz) zeros(sz))
 
     reluLayer('Name','relu_3')
 
-    fullyConnectedLayer(15,...
-        'Name','fc_1',...
-        'WeightsInitializer',...
-        @(sz) randn(sz)*0.01,...
-        'BiasInitializer',...
-        @(sz) zeros(sz))
+    fullyConnectedLayer(15, 'Name','fc_1',...
+        'WeightsInitializer', @(sz) randn(sz)*0.01,...
+        'BiasInitializer', @(sz) zeros(sz))
 
     softmaxLayer('Name','softmax')
     classificationLayer('Name','output')
@@ -284,8 +262,7 @@ TestDatasetPath = fullfile('dataset', 'test');
 imdsTest = imageDatastore(TestDatasetPath, ...
     'IncludeSubfolders', true,...
     'LabelSource', 'foldernames');
-imdsTest.ReadFcn = @(x)imresize(imread(x),...
-                    [64 64]);
+imdsTest.ReadFcn = @(x)imresize(imread(x), [64 64]);
 
 YPredicted = classify(net, imdsTest);
 YTest = imdsTest.Labels;
@@ -293,13 +270,121 @@ YTest = imdsTest.Labels;
 accuracy = sum(YPredicted == YTest) / numel(YTest);
 \end{lstlisting}
 
-TODO
+\subsection{Choice of \texttt{MaxEpoch}}
+
+Training the network with an initial learning rate of $0.001$ and leaving the default number of epochs unalterated led to evident overfitting of the network, as shown in Figure~\ref{fig:maxepoch-overfitting}.
+
+\begin{figure}[ht]
+        \centering
+        \includegraphics[ width=1.0\linewidth, height=\textheight, keepaspectratio]{./pics/maxepoch-overfitting.png}
+        \caption{Overfitting of the network when \texttt{MaxEpoch} is the default value of $30$.}
+        \label{fig:maxepoch-overfitting}
+\end{figure}
+
+With the goal of avoiding overfitting, a lower \texttt{MaxEpoch} value (for instance $8$) should be adopted.
 
 \subsection{Fine-tuning initial learning rate}
 
-In order to fine-tune the initial learning rate, manual trials along with manual inspection was required. Values of $0.1$, $0.01$, $0.001$ and $0.0001$ (representatives of various order of magnitude) were tried.
+Fine-tune the initial learning rate required manual trials along with manual inspection. Values of $0.1$, $0.01$, $0.001$ and $0.0001$ (representatives of various order of magnitude) were tried. Only values in the neighborhood of $0.001$ gave the required performance of around $30\%$. Since the default \texttt{MaxEpoch} value of $30$ led to overfitting, a lower number should be set.
 
-Only values in the neighborhood of $0.001$ gave the required performance of around $30\%$. In particular, testing the network $5$ times, and collecting the accuracy TODO
+In particular, testing the network $5$ times, with an optimal initial learning rate of $0.001$ and $8$ epochs, collecting the accuracy of each run and averaging the results returned the following Table,
+
+\bigskip
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline 
+Initial learning rate & Average of validation accuracy & Average of test set accuracy & Epochs \\
+\hline \hline 
+$0.0005$ & $0.2258$ & $0.1970$ & $8$ \\
+\hline
+$0.001$ & $0.2766$ & $0.2623$ & $8$ \\
+\hline 
+$0.0015$ & $0.2800$ & $0.2919$ & $8$ \\
+\hline
+\end{tabular}
+\end{center}
+\bigskip
+
+Apparently, the baseline network of choice should be the third one with an initial learning rate of $0.0015$. However, the comparison is unfair since that network manifests signs of overfitting beginning with the Epoch $8$. To compare those two networks the group decided to lower the number of Epochs for the third network, and repeat the training:
+
+\bigskip
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline 
+Initial learning rate & Average of validation accuracy & Average of test set accuracy & Epochs \\
+\hline \hline 
+$0.001$ & $0.2766$ & $0.2623$ & $8$\\
+\hline 
+$0.0015$ & $0.2800$ & $0.2664$ & $7$\\
+\hline
+\end{tabular}
+\end{center}
+\bigskip
+
+where in this case the choice makes no real difference with respect to the average of test set accuracy. To keep the baseline as simple as possible, the students decided to elect the first network as the \emph{baseline}, with parameters as following:
+
+\bigskip
+\begin{center}
+\begin{tabular}{|c|c|}
+\hline 
+Baseline parameter & value \\
+\hline \hline 
+Optimization Algorithm & sgdm \\
+\hline 
+\texttt{MaxEpoch} & $8$\\
+\hline 
+Initial Learning Rate & $0.001$\\
+\hline
+MiniBatch size & $32$ \\
+\hline
+Weights initialization & Gaussian with $\mu = 0$ and $\sigma = 0.01$\\
+\hline 
+Bias initialization & $0$\\
+\hline
+\end{tabular}
+\end{center}
+\bigskip
+
+\subsection{Baseline confusion matrix}
+
+To obtain the \emph{confusion matrix} for the chosen baseline network, the students ran the following code to first train the network again, and then plot a confusion matrix as shown in Figure~\ref{fig:baseline-confusion},
+
+\begin{lstlisting}
+InitialLearningRate = 0.001;
+options = trainingOptions('sgdm', ...
+    'InitialLearnRate', InitialLearningRate, ...
+    'ValidationData',imdsValidation, ... 
+    'MiniBatchSize',32, ...
+    'MaxEpochs', 8,...
+    'ExecutionEnvironment','parallel',...
+    'Plots','training-progress'...
+);
+
+net = trainNetwork(imdsTrain,layers,options);
+
+TestDatasetPath = fullfile('dataset','test');
+imdsTest = imageDatastore(TestDatasetPath, ...
+    'IncludeSubfolders',true,'LabelSource','foldernames');
+imdsTest.ReadFcn = @(x)imresize(imread(x),[64 64]);
+
+YPredicted = classify(net,imdsTest);
+YTest = imdsTest.Labels;
+
+accuracy = sum(YPredicted == YTest)/numel(YTest);
+
+figure
+plotconfusion(YTest,YPredicted)
+\end{lstlisting}
+
+\begin{figure}[ht]
+        \centering
+        \includegraphics[ width=1.0\linewidth, height=\textheight, keepaspectratio]{./pics/baseline-confusion.png}
+        \caption{Confusion matrix for the baseline network.}
+        \label{fig:baseline-confusion}
+\end{figure}
+
+TODO DISCUSSION 
 
 \section{Improving the network}
 
