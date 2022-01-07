@@ -55,7 +55,7 @@
 
 \section{Assignment general description}
 
-This project requires the implementation of an image classifier based on convolutional neural networks. The provided dataset (from [Lazebnik et al., 2006]), contains 15 categories (office, kitchen, living room, bedroom, store, industrial, tall building, inside city, street, highway, coast, open country, mountain, forest, suburb), and is already divided in training set and test set.
+This project requires the implementation of an image classifier based on Convolutional Neural Networks. The provided dataset (from [Lazebnik et al., 2006]), contains 15 categories (office, kitchen, living room, bedroom, store, industrial, tall building, inside city, street, highway, coast, open country, mountain, forest, suburb), and is already divided in training set and test set.
 
 
 \section{Goal of this paper}
@@ -63,16 +63,16 @@ This project requires the implementation of an image classifier based on convolu
 This paper had 3 goals of increasing difficulty:
 
 \begin{enumerate}
-    \item building a \emph{shallow network} with a layout specified from the Teacher in order to have a \emph{baseline} network to allow further comparisons. Such baseline should be improved in the subsequent sections;
+    \item building a \emph{shallow network} with a layout specified from the Teacher in order to have a \emph{baseline} network to allow further comparisons. Such baseline should be the reference from which subsequent improvements are evaluated;
     \item improving the previous baseline network and compare results with the baseline. Comments on strategies adopted should be provided;
-    \item adopting \emph{transfer learning} based on the pre-trained network \emph{AlexNet}.
+    \item adopting \emph{transfer learning} based on the pre-trained network \emph{AlexNet}. Comments on performance improvements should be given.
 \end{enumerate}
 
 \section{Adopted tools}
 
 Students adopted the programming language and numeric computing environment \textbf{MATLAB} as both text editor and simulation software to describe, implement and build the trained networks. 
 
-Specific MATLAB Toolbox were needed \--- the project should require \emph{Deep Learning Toolbox}, \emph{Computer Vision Toolbox} and \emph{Image Processing Toolbox}. Optionally, to improve processing speed during the convolutional neural network build phase, students installed and enabled the \emph{Parallel Computing Toolbox}.
+Specific MATLAB Toolbox were needed \--- the project should require \emph{Deep Learning Toolbox}, \emph{Computer Vision Toolbox} and \emph{Image Processing Toolbox}. Optionally, to improve processing speed during the Convolutional Neural Network build phase, students installed and enabled the \emph{Parallel Computing Toolbox}.
 
 
 
@@ -81,7 +81,7 @@ Specific MATLAB Toolbox were needed \--- the project should require \emph{Deep L
 
 \section{Training a baseline network}
 
-The first step was the building a baseline network (a shallow network), whose layout had been assigned by the teacher. In practice, this phase required to strictly follow given requirements in order to obtain \emph{an overall test accuracy of around} $30\%$.
+The first step was the building a baseline network (a shallow network), whose layout had been assigned by the Teacher. In practice, this phase required to strictly follow given requirements in order to obtain \emph{an overall test accuracy of around} $30\%$.
 
 \subsection{Importing the dataset} 
 
@@ -94,7 +94,7 @@ TrainDatasetPath = fullfile('dataset', 'train');
 imds = imageDatastore(TrainDatasetPath, 'IncludeSubfolders', true, 'LabelSource', 'foldernames');
 \end{lstlisting}
 
-Each image in the dataset had its own \--- non common \--- size. Moreover, images do not share a common aspect ratio. In order to obtain a shared size and aspect ratio, the group has chosen to follow the simple approach of \emph{rescaling the whole image independently along the vertical and the horizontal axis}, in order to achieve the proper size. As will be shown later, the chosen aspect ratio will be $1:1$ (a square).
+Each image in the dataset had its own \--- non common \--- size. Moreover, images do not share a common aspect ratio. In order to obtain a shared size and aspect ratio, the group has chosen to follow the simple approach of \emph{rescaling the whole image independently along the vertical and the horizontal axis}, in order to achieve the proper size. As will be shown later, the chosen aspect ratio will be of $1:1$ (a square).
 
 \subsection{Requirements}
 Layout of the network is described in the following Table:
@@ -103,7 +103,7 @@ Layout of the network is described in the following Table:
 \begin{center}
 \begin{tabular}{|c|c|c|}
 \hline 
-\# & type & size \\
+\# & layer type & size and parameters \\
 \hline \hline 
 1 & Image input & $64 \times 64 \times 1$ images \\
 \hline 
@@ -210,7 +210,7 @@ layers = [
 
 A peculiar aspects of this representation is the weights initialization, which is handled by the function handle \texttt{@(sz) randn(sz)*0.01}, which should yield proper random numbers for normally-distributed weights initialization with standard deviation $0.01$. 
 
-Similarly, \texttt{@(sz) zeros(sz)*0.01} will generate the null vectors required to initialize the biases.
+Similarly, \texttt{@(sz) zeros(sz)} will generate the null vectors required to initialize the biases.
 
 A name should be assigned to each layer, while the defined network may be visually inspected with the commands
 
@@ -270,7 +270,7 @@ YTest = imdsTest.Labels;
 accuracy = sum(YPredicted == YTest) / numel(YTest);
 \end{lstlisting}
 
-\subsection{Choice of \texttt{MaxEpoch}}
+\subsection{Choice of \texttt{MaxEpoch} and stopping criterion}
 
 Training the network with an initial learning rate of $0.001$ and leaving the default number of epochs unalterated led to evident overfitting of the network, as shown in Figure~\ref{fig:maxepoch-overfitting}.
 
@@ -287,7 +287,7 @@ With the goal of avoiding overfitting, a lower \texttt{MaxEpoch} value (for inst
 
 Fine-tune the initial learning rate required manual trials along with manual inspection. Values of $0.1$, $0.01$, $0.001$ and $0.0001$ (representatives of various order of magnitude) were tried. Only values in the neighborhood of $0.001$ gave the required performance of around $30\%$. Since the default \texttt{MaxEpoch} value of $30$ led to overfitting, a lower number should be set.
 
-In particular, testing the network $5$ times, with an optimal initial learning rate of $0.001$ and $8$ epochs, collecting the accuracy of each run and averaging the results returned the following Table,
+In particular, testing the network $5$ times, with an optimal initial learning rate of $0.0005$, $0.001$, $0.0015$ and $8$ epochs, collecting the accuracy of each run and averaging the results returned the following Table,
 
 \bigskip
 
@@ -332,7 +332,7 @@ Baseline parameter & value \\
 \hline \hline 
 Optimization Algorithm & sgdm \\
 \hline 
-\texttt{MaxEpoch} & $8$\\
+Epochs (stopping criterion) & $8$\\
 \hline 
 Initial Learning Rate & $0.001$\\
 \hline
@@ -384,9 +384,26 @@ plotconfusion(YTest,YPredicted)
         \label{fig:baseline-confusion}
 \end{figure}
 
-TODO DISCUSSION 
+The confusion matrix shows that there are some classes that are more often misclassified (\texttt{kitchen}, \texttt{industrial}) and some classes that instead are less often misclassified, such as \texttt{highway} and \texttt{street}. Overall accuracy stands at the value $28.9\%$: from this point of view, the baseline should represent an improvement from a completely random classifier, whose performance with respect to this classification task is less than~a~$7\%$.
+
+\clearpage
 
 \section{Improving the network}
+
+The students propose (and have implemented) various methods in order to improve the performance of the Convolutional Neural Network from the baseline $\sim 30\%$ to a $60\%$:
+
+\begin{enumerate}
+    \item \emph{data augmentation};
+    \item addition of \emph{batch normalization layers};
+    \item changing the \emph{size of the convolutional filters};
+    \item use of \emph{dropout layers}.
+\end{enumerate}
+
+Individual contribution and net improvement of each of these methods is not investigated \--- what is provided, instead, is a description of the implementation for each technique along with the necessary details, and a final overview of all improvements altogether with respect to the baseline. 
+
+\subsection{Data augmentation}
+
+The first improvement of the network
 
 \section{Adopting transfer learning with AlexNet}
 
