@@ -399,12 +399,23 @@ The students propose (and have implemented) various methods in order to improve 
     \item use of \emph{dropout layers}.
 \end{enumerate}
 
-Individual contribution and net improvement of each of these methods is not investigated \--- what is provided, instead, is a description of the implementation for each technique along with the necessary details, and a final overview of all improvements altogether with respect to the baseline. 
+Individual contribution and net improvement of each of these methods is not investigated \--- what is provided, instead, is a description of each technique's implementation along with the necessary details, a brief description of the increasing improvements \emph{at each added complexity} and a final overview of all improvements altogether with respect to the baseline. 
 
 \subsection{Data augmentation}
 
-The first improvement of the network
+The first improvement of the network is related to \emph{data augmentation}. The students implemented \emph{left-to-right reflections} of the train set, leaving unalterated the test set required for evaluation.
 
+Running code 
+
+\begin{lstlisting}
+aug = imageDataAugmenter("RandXReflection",true);
+imageSize = [64 64 1];
+auimds = augmentedImageDatastore(imageSize,imdsTrain,'DataAugmentation',aug);
+aunet = trainNetwork(auimds,layers,options);
+\end{lstlisting}
+
+with the same options as the baseline, but \texttt{MaxEpoch} set to $11$ (this kind of training resulted to be slower), returned a validation accuracy of around $\sim 38\%$. Hence, the added complexity represented an improvement from the previous step. 
+ 
 \section{Adopting transfer learning with AlexNet}
 
 

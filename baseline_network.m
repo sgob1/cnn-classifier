@@ -2,16 +2,14 @@ close all
 
 TrainDatasetPath = fullfile('dataset','train');
 
+% BASELINE
+
 imds = imageDatastore(TrainDatasetPath, ...
     'IncludeSubfolders',true,'LabelSource','foldernames');
 imds.ReadFcn = @(x)imresize(imread(x),[64 64]);
 trainQuota=0.85;
 [imdsTrain,imdsValidation] = splitEachLabel(imds,trainQuota,'randomize');
 
-
-
-%'WeightsInitializer', @(sz) randn(sz) * 0.0001, ...
-%'BiasInitializer', @(sz) zeros(sz))
 layers = [
     imageInputLayer([64 64 1],'Name','input')
     
@@ -57,17 +55,19 @@ options = trainingOptions('sgdm', ...
     'Plots','training-progress'...
 );
 
-net = trainNetwork(imdsTrain,layers,options);
+baseline = trainNetwork(imdsTrain,layers,options);
 
 TestDatasetPath = fullfile('dataset','test');
 imdsTest = imageDatastore(TestDatasetPath, ...
     'IncludeSubfolders',true,'LabelSource','foldernames');
 imdsTest.ReadFcn = @(x)imresize(imread(x),[64 64]);
 
-YPredicted = classify(net,imdsTest);
+YPredicted = classify(baseline,imdsTest);
 YTest = imdsTest.Labels;
 
 accuracy = sum(YPredicted == YTest)/numel(YTest);
 
 figure
 plotconfusion(YTest,YPredicted)
+
+
