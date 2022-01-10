@@ -1,0 +1,26 @@
+\contentsline {section}{\numberline {1}Assignment general description}{2}{section.1}%
+\contentsline {section}{\numberline {2}Goal of this paper}{2}{section.2}%
+\contentsline {section}{\numberline {3}Adopted tools}{2}{section.3}%
+\contentsline {section}{\numberline {4}Training a baseline network}{2}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Importing the dataset}{2}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Requirements}{3}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Splitting the dataset}{4}{subsection.4.3}%
+\contentsline {subsection}{\numberline {4.4}Resizing images}{4}{subsection.4.4}%
+\contentsline {subsection}{\numberline {4.5}Layers definition}{4}{subsection.4.5}%
+\contentsline {subsection}{\numberline {4.6}Network training options}{5}{subsection.4.6}%
+\contentsline {subsection}{\numberline {4.7}Training the network and obtaining the accuracy}{6}{subsection.4.7}%
+\contentsline {subsection}{\numberline {4.8}Choice of \texttt {MaxEpoch} and stopping criterion}{6}{subsection.4.8}%
+\contentsline {subsection}{\numberline {4.9}Fine-tuning initial learning rate}{6}{subsection.4.9}%
+\contentsline {subsection}{\numberline {4.10}Baseline confusion matrix}{8}{subsection.4.10}%
+\contentsline {section}{\numberline {5}Improving the network}{10}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Data augmentation}{10}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}Batch normalization}{10}{subsection.5.2}%
+\contentsline {subsection}{\numberline {5.3}Improving convolution layers}{11}{subsection.5.3}%
+\contentsline {subsection}{\numberline {5.4}Modifying parameters}{11}{subsection.5.4}%
+\contentsline {subsection}{\numberline {5.5}Adding fully-connected and dropout layers}{11}{subsection.5.5}%
+\contentsline {subsubsection}{\numberline {5.5.1}Minibatch size}{11}{subsubsection.5.5.1}%
+\contentsline {subsubsection}{\numberline {5.5.2}Initial learning rate}{11}{subsubsection.5.5.2}%
+\contentsline {subsubsection}{\numberline {5.5.3}Optimization algorithm}{11}{subsubsection.5.5.3}%
+\contentsline {subsubsection}{\numberline {5.5.4}MaxEpoch}{11}{subsubsection.5.5.4}%
+\contentsline {subsection}{\numberline {5.6}Adding convolutional layer}{11}{subsection.5.6}%
+\contentsline {section}{\numberline {6}Adopting transfer learning with AlexNet}{11}{section.6}%

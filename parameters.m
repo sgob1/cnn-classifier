@@ -2,7 +2,15 @@ close all
 
 TrainDatasetPath = fullfile('dataset','train');
 
-% IMPROVING MINIBATCH SIZE + ADAM + OTHER PARAMETERS
+% IMPROVING 
+% using sgdm
+% Added fully connected layer
+% Added dropout layer
+% MaxEpoch 25
+% Learning rate 0.001
+% Minibatch 32
+% good improvements
+
 imds = imageDatastore(TrainDatasetPath, ...
     'IncludeSubfolders',true,'LabelSource','foldernames');
 imds.ReadFcn = @(x)imresize(imread(x),[64 64]);
@@ -60,13 +68,12 @@ layers = [
 ];
 
 lgraph = layerGraph(layers); % to run the layers need a name
-analyzeNetwork(lgraph)
+% analyzeNetwork(lgraph)
 InitialLearningRate = 0.001;
 options = trainingOptions('sgdm', ...
     'InitialLearnRate', InitialLearningRate, ...
     'ValidationData',imdsValidation, ... 
     'MiniBatchSize',32, ...
-    'ValidationFrequency',20, ...
     'MaxEpochs', 25,...
     'ExecutionEnvironment','parallel',...
     'Plots','training-progress'...

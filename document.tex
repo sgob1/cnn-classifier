@@ -414,9 +414,70 @@ auimds = augmentedImageDatastore(imageSize,imdsTrain,'DataAugmentation',aug);
 aunet = trainNetwork(auimds,layers,options);
 \end{lstlisting}
 
-with the same options as the baseline, but \texttt{MaxEpoch} set to $11$ (this kind of training resulted to be slower), returned a validation accuracy of around $\sim 38\%$. Hence, the added complexity represented an improvement from the previous step. 
+with the same options as the baseline, but \texttt{MaxEpoch} set to $15$ (this kind of training resulted somehow to be slower), returned a validation accuracy of around $\sim 39\%$. Hence, the added complexity represented a slight improvement from the previous step.
+
+Here are reported pictures of both training progress and confusion matrix,
+
+TODO FIGURES
+
+\subsection{Batch normalization}
+
+The second improvement should consist in adding $3$ \textbf{Batch Normalization layers} before the ReLU layers. Each layer should be added into \texttt{layers} object, by adding line
+
+\begin{lstlisting}
+batchNormalizationLayer('Name','BN_1')
+\end{lstlisting} 
+
+before any ReLU layer. The name of the new layers should be changed accordingly to the place of those layers.
+
+The added complexity resulted in a faster learning (a lower MaxEpoch number should be set, from $15$ to $6$) and a much higher accuracy ($51.11\%$ on validation set, $48.7\%$ on test data).
+
+TODO FIGURES
+
+\subsection{Improving convolution layers}
+
+Convolution layers may be improved by increasing the size of the filter as they move towards the output. In practice, this means modifying the convolution layers such that their size increases from $3\times 3$ to $5\times 5$ and $7 \times 7$,
+
+\begin{lstlisting}
+convolution2dLayer(3,8,'Padding','same','Stride', [1 1], 'Name','conv_1',...
+    'WeightsInitializer', @(sz) randn(sz)*0.01,...
+    'BiasInitializer', @(sz) zeros(sz))
+
+[...]
+
+convolution2dLayer(5,16,'Padding','same','Stride', [1 1], 'Name','conv_2',...
+    'WeightsInitializer',@(sz) randn(sz)*0.01,...
+    'BiasInitializer', @(sz) zeros(sz))
+
+[...]
+
+ convolution2dLayer(7,32,'Padding','same','Stride', [1 1], 'Name','conv_3',...
+    'WeightsInitializer', @(sz) randn(sz)*0.01,...
+    'BiasInitializer', @(sz) zeros(sz))
+\end{lstlisting}
+
+This third addition brought a slight improvement, as the validation accuracy is at $55.11\%$, but the overall test accuracy stands at $50\%$.
+
+TODO FIGURES
+
+\subsection{Modifying parameters}
+
+Editing the parameters should improve the performance of the network.
+
+Parameters that should be subjected to optimization are, \emph{Minibatch Size} (default is $32$), \emph{Initial learning rate} (which was previously set to $0.001$), \emph{optimization algorithm} (`sgdm' or `adam'). Consequently, \emph{MaxEpoch} should be set accordingly, with the goal of avoiding overfitting while leaving the network room for enough complexity.
+
+\subsection{Adding fully-connected and dropout layers}
+\subsubsection{Minibatch size}
+\subsubsection{Initial learning rate}
+\subsubsection{Optimization algorithm}
+\subsubsection{MaxEpoch}
+\subsection{Adding convolutional layer}
+
+
+
  
 \section{Adopting transfer learning with AlexNet}
+
 
 
 \end{document}
