@@ -91,9 +91,9 @@ TestDatasetPath = fullfile('dataset','test');
 imdsTest = imageDatastore(TestDatasetPath, ...
     'IncludeSubfolders',true,'LabelSource','foldernames');
 imdsTest.ReadFcn = @(x)imresize(imread(x),[64 64]);
+YTest = imdsTest.Labels;
 
 % Evaluating ensamble network accuracy
-
 for i=1:EnsambleNum
     YPred = classify(net(i),imdsTest);
     for j=1:size(YPred)
