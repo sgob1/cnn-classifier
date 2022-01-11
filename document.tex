@@ -103,7 +103,7 @@ Layout of the network is described in the following Table:
 \begin{center}
 \begin{tabular}{|c|c|c|}
 \hline 
-\# & layer type & size and parameters \\
+Baseline Layout & layer type & size and parameters \\
 \hline \hline 
 1 & Image input & $64 \times 64 \times 1$ images \\
 \hline 
@@ -428,7 +428,7 @@ The second improvement should consist in adding $3$ \textbf{Batch Normalization 
 batchNormalizationLayer('Name','BN_1')
 \end{lstlisting} 
 
-before any ReLU layer. The name of the new layers should be changed accordingly to the place of those layers.
+before any ReLU layer. The name of the new layers should be changed accordingly to the position of those layers.
 
 The added complexity resulted in a faster learning (a lower MaxEpoch number should be set, from $15$ to $6$) and a much higher accuracy ($51.11\%$ on validation set, $48.7\%$ on test data).
 
@@ -436,7 +436,7 @@ TODO FIGURES
 
 \subsection{Improving convolution layers}
 
-Convolution layers may be improved by increasing the size of the filter as they move towards the output. In practice, this means modifying the convolution layers such that their size increases from $3\times 3$ to $5\times 5$ and $7 \times 7$,
+Convolution layers may be improved by increasing the size of the filter as they are placed towards the output. In practice, this means modifying the convolution layers such that their size increases from $3\times 3$ only, to $3 \times 3$, $5\times 5$ and $7 \times 7$:
 
 \begin{lstlisting}
 convolution2dLayer(3,8,'Padding','same','Stride', [1 1], 'Name','conv_1',...
@@ -460,19 +460,112 @@ This third addition brought a slight improvement, as the validation accuracy is 
 
 TODO FIGURES
 
-\subsection{Modifying parameters}
+\subsection{Modifying network layout}
 
-Editing the parameters should improve the performance of the network.
+Editing the layout of the network should improve the overall accuracy.
 
-Parameters that should be subjected to optimization are, \emph{Minibatch Size} (default is $32$), \emph{Initial learning rate} (which was previously set to $0.001$), \emph{optimization algorithm} (`sgdm' or `adam'). Consequently, \emph{MaxEpoch} should be set accordingly, with the goal of avoiding overfitting while leaving the network room for enough complexity.
+Since layout of the network changed, \emph{MaxEpoch} should be set accordingly, with the goal of avoiding overfitting while leaving the network room for enough complexity.
 
-\subsection{Adding fully-connected and dropout layers}
-\subsubsection{Minibatch size}
-\subsubsection{Initial learning rate}
-\subsubsection{Optimization algorithm}
+\subsubsection{Adding fully-connected and dropout layers}
+
+A new fully-connected layer, along with a ReLU layer, were added:
+
+\begin{lstlisting}
+fullyConnectedLayer(256,'Name','fc_1',...
+    'WeightsInitializer', @(sz) randn(sz)*0.01,...
+    'BiasInitializer', @(sz) zeros(sz))
+reluLayer('Name','relu_4')
+\end{lstlisting}
+
+A dropout layer separating the two fully-connected layers was added too,
+
+\begin{lstlisting}
+dropoutLayer(.25, 'Name', 'dropout_1')
+\end{lstlisting}
+
 \subsubsection{MaxEpoch}
-\subsection{Adding convolutional layer}
 
+In order to let the network have enough room for complexity, a \texttt{MaxEpoch} value of $25$ should be set.
+
+\subsubsection{Results}
+
+Overall network layout is illustrated in the following Table:
+
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline 
+Improved Network Layout & layer type & size and parameters \\
+\hline \hline 
+1 & Image input & $64 \times 64 \times 1$ images \\
+\hline 
+2 & Convolution & $8 \mbox{ } 3 \times 3$ convolutions, stride 1 \\
+\hline 
+3 & Batch Normalization & \\
+\hline
+4 & ReLU &  \\
+\hline 
+5 & Max Pooling & $2 \times 2$ max pooling, stride 2 \\
+\hline
+6 & Convolution & $16 \mbox{ } 5 \times 5$ convolutions, stride 1 \\
+\hline 
+7 & Batch Normalization & \\
+\hline
+8 & ReLU &  \\
+\hline 
+9 & Max Pooling & $2 \times 2$ max pooling, stride 2 \\
+\hline
+10 & Convolution & $32 \mbox{ } 7 \times 7$ convolutions, stride 1 \\
+\hline 
+11 & Batch Normalization & \\
+\hline
+12 & ReLU & \\
+\hline 
+13 & Max Pooling & $2 \times 2$ max pooling, stride 2 \\
+\hline
+14 & Fully Connected & $256$ \\
+\hline
+15 & ReLU & \\
+\hline
+16 & Dropout & $25\%$ \\
+\hline
+17 & Fully Connected & $15$ \\
+\hline
+18 & Softmax & softmax \\
+\hline \hline 
+19 & Classification & crossentropyex \\
+\hline
+\end{tabular}
+\end{center}
+\bigskip
+
+while training options are listed below,
+
+\bigskip
+\begin{center}
+\begin{tabular}{|c|c|}
+\hline 
+Improved Network parameter & value \\
+\hline \hline 
+Optimization Algorithm & sgdm \\
+\hline 
+Epochs (stopping criterion) & $25$\\
+\hline 
+Initial Learning Rate & $0.001$\\
+\hline
+MiniBatch size & $32$ \\
+\hline
+Weights initialization & Gaussian with $\mu = 0$ and $\sigma = 0.01$\\
+\hline 
+Bias initialization & $0$\\
+\hline
+\end{tabular}
+\end{center}
+\bigskip
+
+
+Students reported that these further improvements led to a \emph{validation accuracy} of around $60\%$, while the \emph{test accuracy} stands at a $57\%$ on average.
+
+\subsection{Parameters and layout enhancements that didn't provide benefit}
 
 
  
