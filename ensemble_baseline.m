@@ -66,6 +66,8 @@ imdsTest = imageDatastore(TestDatasetPath, ...
         'IncludeSubfolders',true,'LabelSource','foldernames');
 imdsTest.ReadFcn = @(x)imresize(imread(x),[64 64]);
 YTest = imdsTest.Labels;
+
+% Evaluating ensamble network accuracy
 for i=1:EnsambleNum
     YPred = classify(baseline(i),imdsTest);
     for j=1:size(YPred)
@@ -84,11 +86,12 @@ accuracy = sum(predicted_output == YTest)/numel(YTest);
 figure
 plotconfusion(YTest, predicted_output')
 
-sum = 0;
+% Evaluating average of single networks accuracy
+sums = 0;
 for i=1:EnsambleNum
-    YPred = classify(baseline(i),imdsTest);
+    YPred = classify(net(i),imdsTest);
     accuracy_single(i) = sum(YPred == YTest)/numel(YTest);
-    sum = sum + accuracy_single(i);
+    sums = sums + accuracy_single(i);
 end
 
-accuracy_average = sum / EnsambleNum;
+accuracy_average = sums / EnsambleNum;

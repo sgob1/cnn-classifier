@@ -416,10 +416,6 @@ aunet = trainNetwork(auimds,layers,options);
 
 with the same options as the baseline, but \texttt{MaxEpoch} set to $15$ (this kind of training resulted somehow to be slower), returned a validation accuracy of around $\sim 39\%$. Hence, the added complexity represented a slight improvement from the previous step.
 
-Here are reported pictures of both training progress and confusion matrix,
-
-TODO FIGURES
-
 \subsection{Batch normalization}
 
 The second improvement should consist in adding $3$ \textbf{Batch Normalization layers} before the ReLU layers. Each layer should be added into \texttt{layers} object, by adding line
@@ -431,8 +427,6 @@ batchNormalizationLayer('Name','BN_1')
 before any ReLU layer. The name of the new layers should be changed accordingly to the position of those layers.
 
 The added complexity resulted in a faster learning (a lower MaxEpoch number should be set, from $15$ to $6$) and a much higher accuracy ($51.11\%$ on validation set, $48.7\%$ on test data).
-
-TODO FIGURES
 
 \subsection{Improving convolution layers}
 
@@ -457,8 +451,6 @@ convolution2dLayer(5,16,'Padding','same','Stride', [1 1], 'Name','conv_2',...
 \end{lstlisting}
 
 This third addition brought a slight improvement, as the validation accuracy is at $55.11\%$, but the overall test accuracy stands at $50\%$.
-
-TODO FIGURES
 
 \subsection{Modifying network layout}
 
@@ -487,7 +479,7 @@ dropoutLayer(.25, 'Name', 'dropout_1')
 
 In order to let the network have enough room for complexity, a \texttt{MaxEpoch} value of $25$ should be set.
 
-\subsubsection{Results}
+\subsubsection{Results}\label{sec:results}
 
 Overall network layout is illustrated in the following Table:
 
@@ -565,9 +557,70 @@ Bias initialization & $0$\\
 
 Students reported that these further improvements led to a \emph{validation accuracy} of around $60\%$, while the \emph{test accuracy} stands at a $57\%$ on average.
 
-\subsection{Parameters and layout enhancements that didn't provide benefit}
+TODO ADD FIGURES: Progress + Confusion matrix
+
+\subsection{Parameters and layout enhancements that did not provide benefit}
+
+Students chose the simplest network among many others that did not bring much of an improvement. The choice of the simplest network has been determined by three factors:
+
+\begin{enumerate}
+    \item the network should have a significantly higher overall accuracy when compared to others;
+    \item if not, the network should not see its complexity increased with no tangible benefit performance-wise;
+    \item if not, the network should be as much comparable as possible to the baseline (it shouold share the same parameters as much as possible).
+\end{enumerate}
+
+With this two fundamental goals in mind, the students discarded other configurations which did not result in significant improvements performance-wise, or introduced higher complexity, with less parameters shared between the improved network and the baseline.
+
+In particular,
+
+\begin{itemize}
+    \item increasing or lowering the size of \emph{MiniBatch} has not been sufficient to improve performance \--- however, it changed significantly the behavior of the training phase, which required setting the \emph{initial learning rate} to a different value;
+    \item switching the optimization algorithm to \emph{adam} has not been sufficient to show significant improvements, despite requiring different parameter values. Students tried many different variants of the network with the adam optimization algorithm, however the results were not good enough to justify the switch;
+    \item adding any convolutional layer did not result in performance improvements.
+\end{itemize}
 
 
+\subsection{Comparison with the baseline}
+
+TODO ADD FIGURES: comparison between training phases, confusion matrices
+
+\subsection{Ensamble network based on previous improvements}
+
+The students implemented an \textbf{ensamble network}, composed of $5$ networks of the same layout as in Section~\ref{sec:results}. In order to assign the class, a \emph{voting} system has been built: each network of the ensamble casts a vote (a class), and the overall output is the \emph{most common predicted class} among the ensamble.
+
+The code related to the ensamble prediction is the following one,
+
+\begin{lstlisting}
+% Evaluating ensamble network accuracy
+
+for i=1:EnsambleNum
+    YPred = classify(net(i),imdsTest);
+    for j=1:size(YPred)
+        YPredicted(j,i) = YPred(j);
+    end
+end    
+
+categ = categorical(categories(YTest));
+for i=1:size(YPred)
+    [v, argmax] = max(countcats(YPredicted(i,:)));
+    predicted_output(i) = categ(argmax);
+end
+
+accuracy = sum(predicted_output == YTest)/numel(YTest);
+figure
+plotconfusion(YTest, predicted_output')
+\end{lstlisting}
+
+where \texttt{net(i)} is a network belonging to an array of $5$ trained networks. As a result, the above code will plot a confusion matrix for the ensamble network.
+
+TODO FIGURE ensamble network confusion matrix
+
+Ensamble training is very heavy on resources. Time training $5$ networks is significantly higher than the time required for training a single network. Hence, The students questioned themselves whether an ensamble of $10$ networks could bring any improvement with respect to an ensamble of $5$.
+
+TODO explain that 10 networks are not really an improvement
+
+
+\subsection{Comparison with the baseline}
  
 \section{Adopting transfer learning with AlexNet}
 

@@ -15,7 +15,7 @@ imds = imageDatastore(TrainDatasetPath, ...
     'IncludeSubfolders',true,'LabelSource','foldernames');
 imds.ReadFcn = @(x)imresize(imread(x),[64 64]);
 
-EnsambleNum = 10;
+EnsambleNum = 3;
 for i = 1:EnsambleNum
     trainQuota=0.85;
     [imdsTrain,imdsValidation] = splitEachLabel(imds,trainQuota,'randomize');
@@ -81,6 +81,9 @@ for i = 1:EnsambleNum
         'ExecutionEnvironment','parallel'...
         );
 
+    disp("------------------------------")
+    disp("Beginning learning of network:")
+    disp(i)
     net(i) = trainNetwork(auimds,layers,options);
 end
 
@@ -118,3 +121,4 @@ for i=1:EnsambleNum
 end
 
 accuracy_average = sums / EnsambleNum;
+disp(accuracy_average);
