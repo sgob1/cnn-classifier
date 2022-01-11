@@ -15,7 +15,7 @@ imds = imageDatastore(TrainDatasetPath, ...
     'IncludeSubfolders',true,'LabelSource','foldernames');
 imds.ReadFcn = @(x)imresize(imread(x),[64 64]);
 
-EnsambleNum = 3;
+EnsambleNum = 5;
 for i = 1:EnsambleNum
     trainQuota=0.85;
     [imdsTrain,imdsValidation] = splitEachLabel(imds,trainQuota,'randomize');
