@@ -1,4 +1,4 @@
-close all
+clear all
 
 TrainDatasetPath = fullfile('dataset','train');
 

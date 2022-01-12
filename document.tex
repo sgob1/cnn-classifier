@@ -103,7 +103,7 @@ Layout of the network is described in the following Table:
 \begin{center}
 \begin{tabular}{|c|c|c|}
 \hline 
-Baseline Layout & layer type & size and parameters \\
+\textbf{Baseline Layout} & \textbf{Layer type} & \textbf{Size and parameters} \\
 \hline \hline 
 1 & Image input & $64 \times 64 \times 1$ images \\
 \hline 
@@ -283,7 +283,7 @@ Training the network with an initial learning rate of $0.001$ and leaving the de
 
 With the goal of avoiding overfitting, a lower \texttt{MaxEpoch} value (for instance $8$) should be adopted.
 
-\subsection{Fine-tuning initial learning rate}
+\subsection{Fine-tuning initial learning rate}\label{sec:baseline-parameters}
 
 Fine-tune the initial learning rate required manual trials along with manual inspection. Values of $0.1$, $0.01$, $0.001$ and $0.0001$ (representatives of various order of magnitude) were tried. Only values in the neighborhood of $0.001$ gave the required performance of around $30\%$. Since the default \texttt{MaxEpoch} value of $30$ led to overfitting, a lower number should be set.
 
@@ -294,7 +294,7 @@ In particular, testing the network $5$ times, with an optimal initial learning r
 \begin{center}
 \begin{tabular}{|c|c|c|c|}
 \hline 
-Initial learning rate & Average of validation accuracy & Average of test set accuracy & Epochs \\
+\textbf{Initial learning rate} & \textbf{Average of validation accuracy} & \textbf{Average of test set accuracy} & \textbf{Epochs} \\
 \hline \hline 
 $0.0005$ & $0.2258$ & $0.1970$ & $8$ \\
 \hline
@@ -312,7 +312,7 @@ Apparently, the baseline network of choice should be the third one with an initi
 \begin{center}
 \begin{tabular}{|c|c|c|c|}
 \hline 
-Initial learning rate & Average of validation accuracy & Average of test set accuracy & Epochs \\
+\textbf{Initial learning rate} & \textbf{Average of validation accuracy} & \textbf{Average of test set accuracy} & \textbf{Epochs} \\
 \hline \hline 
 $0.001$ & $0.2766$ & $0.2623$ & $8$\\
 \hline 
@@ -328,7 +328,7 @@ where in this case the choice makes no real difference with respect to the avera
 \begin{center}
 \begin{tabular}{|c|c|}
 \hline 
-Baseline parameter & value \\
+\textbf{Baseline parameter} & \textbf{Value} \\
 \hline \hline 
 Optimization Algorithm & sgdm \\
 \hline 
@@ -346,7 +346,16 @@ Bias initialization & $0$\\
 \end{center}
 \bigskip
 
-\subsection{Baseline confusion matrix}
+\subsection{Baseline training progress and confusion matrix}
+
+The overall training progress for the baseline network is shown in Figure~\ref{fig:baseline-progress}.
+
+\begin{figure}[ht]
+        \centering
+        \includegraphics[ width=1.0\linewidth, height=\textheight, keepaspectratio]{./pics/baseline-progress.png}
+        \caption{Training progress for the baseline network.}
+        \label{fig:baseline-progress}
+\end{figure}
 
 To obtain the \emph{confusion matrix} for the chosen baseline network, the students ran the following code to first train the network again, and then plot a confusion matrix as shown in Figure~\ref{fig:baseline-confusion},
 
@@ -396,7 +405,7 @@ The students propose (and have implemented) various methods in order to improve 
     \item \emph{data augmentation};
     \item addition of \emph{batch normalization layers};
     \item changing the \emph{size of the convolutional filters};
-    \item use of \emph{dropout layers}.
+    \item modifying network layout;
 \end{enumerate}
 
 Individual contribution and net improvement of each of these methods is not investigated \--- what is provided, instead, is a description of each technique's implementation along with the necessary details, a brief description of the increasing improvements \emph{at each added complexity} and a final overview of all improvements altogether with respect to the baseline. 
@@ -428,7 +437,7 @@ before any ReLU layer. The name of the new layers should be changed accordingly 
 
 The added complexity resulted in a faster learning (a lower MaxEpoch number should be set, from $15$ to $6$) and a much higher accuracy ($51.11\%$ on validation set, $48.7\%$ on test data).
 
-\subsection{Improving convolution layers}
+\subsection{Improving convolutional layers}
 
 Convolution layers may be improved by increasing the size of the filter as they are placed towards the output. In practice, this means modifying the convolution layers such that their size increases from $3\times 3$ only, to $3 \times 3$, $5\times 5$ and $7 \times 7$:
 
@@ -486,7 +495,7 @@ Overall network layout is illustrated in the following Table:
 \begin{center}
 \begin{tabular}{|c|c|c|}
 \hline 
-Improved Network Layout & layer type & size and parameters \\
+\textbf{Improved Network Layout} & \textbf{Layer type} & \textbf{Size and parameters} \\
 \hline \hline 
 1 & Image input & $64 \times 64 \times 1$ images \\
 \hline 
@@ -536,7 +545,7 @@ while training options are listed below,
 \begin{center}
 \begin{tabular}{|c|c|}
 \hline 
-Improved Network parameter & value \\
+\textbf{Improved Network parameter} & \textbf{Value} \\
 \hline \hline 
 Optimization Algorithm & sgdm \\
 \hline 
@@ -557,16 +566,16 @@ Bias initialization & $0$\\
 
 Students reported that these further improvements led to a \emph{validation accuracy} of around $60\%$, while the \emph{test accuracy} stands at a $57\%$ on average.
 
-TODO ADD FIGURES: Progress + Confusion matrix
+Training progress and confusion matrix, along with a comparison with the baseline, will be discussed in Section~\ref{sec:baseline-comparison}.
 
 \subsection{Parameters and layout enhancements that did not provide benefit}
 
 Students chose the simplest network among many others that did not bring much of an improvement. The choice of the simplest network has been determined by three factors:
 
 \begin{enumerate}
-    \item the network should have a significantly higher overall accuracy when compared to others;
+    \item the network should have a higher overall accuracy when compared to others;
     \item if not, the network should not see its complexity increased with no tangible benefit performance-wise;
-    \item if not, the network should be as much comparable as possible to the baseline (it shouold share the same parameters as much as possible).
+    \item if not, the network should be as much comparable as possible to the baseline (it should share the same parameters as much as possible).
 \end{enumerate}
 
 With this two fundamental goals in mind, the students discarded other configurations which did not result in significant improvements performance-wise, or introduced higher complexity, with less parameters shared between the improved network and the baseline.
@@ -575,14 +584,34 @@ In particular,
 
 \begin{itemize}
     \item increasing or lowering the size of \emph{MiniBatch} has not been sufficient to improve performance \--- however, it changed significantly the behavior of the training phase, which required setting the \emph{initial learning rate} to a different value;
-    \item switching the optimization algorithm to \emph{adam} has not been sufficient to show significant improvements, despite requiring different parameter values. Students tried many different variants of the network with the adam optimization algorithm, however the results were not good enough to justify the switch;
+    \item switching the optimization algorithm to \emph{adam} has not been sufficient to show significant improvements, even after fine-tuning parameters. Students tried many different variants of the network with the adam optimization algorithm, however the results were not good enough to justify the switch;
     \item adding any convolutional layer did not result in performance improvements.
 \end{itemize}
 
 
-\subsection{Comparison with the baseline}
+\subsection{Comparison with the baseline}\label{sec:baseline-comparison}
 
-TODO ADD FIGURES: comparison between training phases, confusion matrices
+The students collected pictures of training progress and relative confusion matrix of both \emph{baseline network} (parameters in Section~\ref{sec:baseline-parameters}) and \emph{improved network} (parameters in Section~\ref{sec:results}).
+
+Figure~\ref{fig:comparison-confusion} shows that classes that had been better predicted by the baseline network are still among those better predicted by the improved network too (for instance, \emph{Street} and \emph{TallBuilding}), while some other classes that were initially difficult have seen a huge improvement (\emph{Bedroom} class, \emph{Forest} class, \emph{Kitchen} class).
+
+In general, the improved network shows significant better performance when compared to the baseline network, at the cost of added complexity and some more training time required.
+
+\begin{figure}[ht]
+        \centering
+        \includegraphics[ width=1.0\linewidth, height=\textheight, keepaspectratio]{./pics/comparison-progress.png}
+        \caption{Comparison between training progress of the baseline network (on top) and training progress of the improved network (on bottom).}
+        \label{fig:comparison-progress}
+\end{figure}
+
+\begin{figure}[ht]
+        \centering
+        \includegraphics[ width=0.8\linewidth, height=0.8\textheight, keepaspectratio]{./pics/comparison-confusion.png}
+        \caption{Comparison between confusion matrices of the baseline network (top) and the improved network (bottom).}
+        \label{fig:comparison-confusion}
+\end{figure}
+
+\clearpage
 
 \subsection{Ensamble network based on previous improvements}
 
@@ -593,6 +622,7 @@ The code related to the ensamble prediction is the following one,
 \begin{lstlisting}
 % Evaluating ensamble network accuracy
 
+EnsambleNum=5;
 for i=1:EnsambleNum
     YPred = classify(net(i),imdsTest);
     for j=1:size(YPred)
@@ -613,14 +643,34 @@ plotconfusion(YTest, predicted_output')
 
 where \texttt{net(i)} is a network belonging to an array of $5$ trained networks. As a result, the above code will plot a confusion matrix for the ensamble network.
 
-TODO FIGURE ensamble network confusion matrix
+\subsection{Justifying the added complexity}
 
-Ensamble training is very heavy on resources. Time training $5$ networks is significantly higher than the time required for training a single network. Hence, The students questioned themselves whether an ensamble of $10$ networks could bring any improvement with respect to an ensamble of $5$.
+Ensamble training is very heavy on resources. Time training multiple networks is significantly higher than the time required for training a single network, let alone the time necessary for both training and classifying with an ensamble of networks. Hence, the students questioned themselves whether an ensamble of more networks (for instance, $10$ networks or more) could bring any improvement with respect to an ensamble of $5$ or less.
 
-TODO explain that 10 networks are not really an improvement
+In order to answer the question, the students collected test accuracy of ensamble networks of different number $B$ of networks, and compared them with the average of the single networks in the ensamble when taken alone. Each ensamble network has been trained separately, and results has been collected in the following table.
 
+\begin{center}
+\begin{tabular}{|c||c|c|c|}
+\hline
+\textbf{B} & \textbf{Single networks average accuracy} & \textbf{Ensamble test set accuracy} & \textbf{Net improvement}\\
+\hline
+\hline
+3 & $0.5763$ & $0.5950$ & $1.87\%$ \\
+\hline
+5 & $0.5863$ & $0.6280$ & $4.17\%$ \\
+\hline
+7 & $0.5868$ & $0.6340$ & $4.72\%$\\
+\hline
+10 & $0.5841$ & $0.6410$ & $5.69\%$\\
+\hline
+15 & $0.5871$ & $0.6470$ & $5.99\%$\\
+\hline
+\end{tabular}
+\end{center}
 
-\subsection{Comparison with the baseline}
+Basically, training an ensamble of $B=5$ networks should be enough to provide tangible benefits, with even higher improvements over the single networks when training a $B=10$ ensamble network (although the improvements are not so pronounced).
+
+Training the network with $B=15$ only introduced a moderate improvement, thus such a high number of networks is not strictly required and would instead offer more disadvantages than advantages (for instance, training and classification time) with respect to an ensamble network having only $5$ or $10$ networks.
  
 \section{Adopting transfer learning with AlexNet}
 
