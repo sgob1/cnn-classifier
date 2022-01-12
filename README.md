@@ -48,6 +48,7 @@ Comment on any significant change you notice after the application of the previo
 
 For instance AlexNet [Krizhevsky et al., 2012], in the following two manners (in both of the cases you should get a test accuracy above 85%):
 
++ freeze the weights of all the layers but the last fully connected layer and fine-tune the weights of the last layer based on the same train and validation sets employed before;
 + employ the pre-trained network as a feature extractor, accessing the activation of an intermediate layer (for instance the last convolutional layer) and train a multiclass linear SVM. For implementing the multiclass SVM use any of the approaches seen in the lectures, for instance DAG.
 
 ### Optional tasks

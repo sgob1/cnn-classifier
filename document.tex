@@ -647,7 +647,7 @@ where \texttt{net(i)} is a network belonging to an array of $5$ trained networks
 
 Ensamble training is very heavy on resources. Time training multiple networks is significantly higher than the time required for training a single network, let alone the time necessary for both training and classifying with an ensamble of networks. Hence, the students questioned themselves whether an ensamble of more networks (for instance, $10$ networks or more) could bring any improvement with respect to an ensamble of $5$ or less.
 
-In order to answer the question, the students collected test accuracy of ensamble networks of different number $B$ of networks, and compared them with the average of the single networks in the ensamble when taken alone. Each ensamble network has been trained separately, and results has been collected in the following table.
+In order to answer the question, the students collected test accuracy of ensamble networks of different number $B$ of networks, and compared them with the average of every single network in the ensamble. Each ensamble network has been trained separately, and results has been collected in the following table.
 
 \begin{center}
 \begin{tabular}{|c||c|c|c|}
@@ -672,7 +672,7 @@ Basically, training an ensamble of $B=5$ networks should be enough to provide ta
 
 Training the network with $B=15$ only introduced a moderate improvement, thus such a high number of networks is not strictly required and would instead offer more disadvantages than advantages (for instance, training and classification time) with respect to an ensamble network having only $5$ or $10$ networks.
 
-At every run, ensamble networks gained more accuracy on the test set with respect to a single network. In addition, the single network performance is very unreliable, largely depending on the randomness of the learning phase, with test set accuracy values ranging from $55\%$ to over $60\%$ \--- on contrary, the ensamble network accuracy has proven to be much more reliable over different runs. On this particular task, ensamble learning has proven to be effective \--- however, its increased complexity and time required for training and classification cannot be undervalued. A good trade-off between net~improvement and increased complexity could be a choice of $B=5$ networks for the ensamble network, which should bring the accuracy of the student's model well-above $60\%$.
+At every run, ensamble networks had shown more accuracy on the test set with respect to the single network. In addition, the single network performance is very unreliable, largely depending on the randomness of the learning phase, with test set accuracy values ranging from $55\%$ to over $60\%$ \--- on contrary, the ensamble network accuracy has proven to be much more reliable over different runs. On this particular task, ensamble learning has proven to be effective \--- however, its increased complexity and time required for training and classification cannot be undervalued. A good trade-off between net~improvement and increased complexity could be a choice of $B=5$ networks for the ensamble network, which should bring the accuracy of the student's proposed model well-above $60\%$.
  
 \section{Adopting transfer learning with AlexNet}
 
