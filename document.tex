@@ -399,7 +399,7 @@ The confusion matrix shows that there are some classes that are more often miscl
 
 \section{Improving the network}
 
-The students propose (and have implemented) various methods in order to improve the performance of the Convolutional Neural Network from the baseline $\sim 30\%$ to a $60\%$:
+The students propose (and have implemented) various methods in order to double the performance of the Convolutional Neural Network from the baseline $\sim 30\%$ to a $60\%$:
 
 \begin{enumerate}
     \item \emph{data augmentation};
@@ -568,7 +568,7 @@ Students reported that these further improvements led to a \emph{validation accu
 
 Training progress and confusion matrix, along with a comparison with the baseline, will be discussed in Section~\ref{sec:baseline-comparison}.
 
-\subsection{Parameters and layout enhancements that did not provide benefit}
+\subsection{Parameters and layout enhancements that did not provide benefit}\label{sec:no-benefits}
 
 Students chose the simplest network among many others that did not bring much of an improvement. The choice of the simplest network has been determined by three factors:
 
@@ -595,7 +595,7 @@ The students collected pictures of training progress and relative confusion matr
 
 Figure~\ref{fig:comparison-confusion} shows that classes that had been better predicted by the baseline network are still among those better predicted by the improved network too (for instance, \emph{Street} and \emph{TallBuilding}), while some other classes that were initially difficult have seen a huge improvement (\emph{Bedroom} class, \emph{Forest} class, \emph{Kitchen} class).
 
-In general, the improved network shows significant better performance when compared to the baseline network, at the cost of added complexity and some more training time required.
+In general, the improved network shows significant better performance when compared to the baseline network (an almost doubled accuracy on both validation and test set), at the cost of added complexity and some more training time required. Other variants of the improved network were tried by varying parameters and layout as described in Section~\ref{sec:no-benefits}, but no significant accuracy improvements justified the applied changes.
 
 \begin{figure}[ht]
         \centering
@@ -671,6 +671,8 @@ In order to answer the question, the students collected test accuracy of ensambl
 Basically, training an ensamble of $B=5$ networks should be enough to provide tangible benefits, with even higher improvements over the single networks when training a $B=10$ ensamble network (although the improvements are not so pronounced).
 
 Training the network with $B=15$ only introduced a moderate improvement, thus such a high number of networks is not strictly required and would instead offer more disadvantages than advantages (for instance, training and classification time) with respect to an ensamble network having only $5$ or $10$ networks.
+
+At every run, ensamble networks gained more accuracy on the test set with respect to a single network. In addition, the single network performance is very unreliable, largely depending on the randomness of the learning phase, with test set accuracy values ranging from $55\%$ to over $60\%$ \--- on contrary, the ensamble network accuracy has proven to be much more reliable over different runs. On this particular task, ensamble learning has proven to be effective \--- however, its increased complexity and time required for training and classification cannot be undervalued. A good trade-off between net~improvement and increased complexity could be a choice of $B=5$ networks for the ensamble network, which should bring the accuracy of the student's model well-above $60\%$.
  
 \section{Adopting transfer learning with AlexNet}
 
