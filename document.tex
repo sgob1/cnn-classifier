@@ -12,7 +12,8 @@
 
 \usepackage{color} % Allows defining colors for code snippets
 \usepackage{setspace} % Sets leading
-\usepackage[a4paper, inner=0.5cm, outer=0.5cm, lmargin=2cm, rmargin=2cm, tmargin=2.5cm, bmargin=2.5cm]{geometry} % Sets margins and borders
+\usepackage{parskip}
+\usepackage[a4paper, inner=0.5cm, outer=0.5cm, lmargin=2.1cm, rmargin=2.1cm, tmargin=2.5cm, bmargin=2.1cm]{geometry} % Sets margins and borders
 
 \usepackage{listings}
 \definecolor{dkgreen}{rgb}{0.1,0.5,0.1}
@@ -81,7 +82,7 @@ Specific MATLAB Toolbox were needed \--- the project should require \emph{Deep L
 
 \section{Training a baseline network}
 
-The first step was the building a baseline network (a shallow network), whose layout had been assigned by the Teacher. In practice, this phase required to strictly follow given requirements in order to obtain \emph{an overall test accuracy of around} $30\%$.
+The first step was the building of a baseline network (a shallow network), whose layout had been assigned by the Teacher. In practice, this phase required to strictly follow given requirements in order to obtain \emph{an overall test accuracy of around} $30\%$.
 
 \subsection{Importing the dataset} 
 
@@ -97,13 +98,14 @@ imds = imageDatastore(TrainDatasetPath, 'IncludeSubfolders', true, 'LabelSource'
 Each image in the dataset had its own \--- non common \--- size. Moreover, images do not share a common aspect ratio. In order to obtain a shared size and aspect ratio, the group has chosen to follow the simple approach of \emph{rescaling the whole image independently along the vertical and the horizontal axis}, in order to achieve the proper size. As will be shown later, the chosen aspect ratio will be of $1:1$ (a square).
 
 \subsection{Requirements}
-Layout of the network is described in the following Table:
+Layout of the network is described in the following Table~\ref{tab:baseline-layout}:
 \bigskip
 
-\begin{center}
+\begin{table}[ht]
+\centering
 \begin{tabular}{|c|c|c|}
 \hline 
-\textbf{Baseline Layout} & \textbf{Layer type} & \textbf{Size and parameters} \\
+\textbf{\#} & \textbf{Layer type} & \textbf{Size and parameters} \\
 \hline \hline 
 1 & Image input & $64 \times 64 \times 1$ images \\
 \hline 
@@ -130,18 +132,19 @@ Layout of the network is described in the following Table:
 12 & Classification & crossentropyex \\
 \hline
 \end{tabular}
-\end{center}
+\caption{Baseline Layout}\label{tab:baseline-layout}
+\end{table}
 \bigskip
 
 Other non-optional requirements were the following ones,
 
 \begin{itemize}
-    \item using input images of size $64 \times 64$ (as shown in layer $1$ of previous Table);
+    \item using input images of size $64 \times 64$ (as shown in layer $1$ of Table~\ref{tab:baseline-layout});
     \item use $85\%$ of the provided dataset for the training set and the remaining portion for the validation set, so that each label is properly split with the same percentage;
     \item employ \textbf{stochastic gradient descent with momentum} as the optimization algorithm;
     \item adopt \emph{minibatches} of size $32$;
     \item initial weights should be drawn from a Gaussian distribution with a mean of $0$ and a standard deviation of $0.01$. Initial bias values should be set to $0$;
-    \item choose a stopping criterion;
+    \item choose a stopping criterion.
 \end{itemize}
 
 \subsection{Splitting the dataset}
@@ -167,7 +170,7 @@ This command should overload the \texttt{ReadFcn} function inside \texttt{imds},
 
 \subsection{Layers definition}
 
-Layers layout is specified in the provided Table. In order to obtain such layout, the students organized the network layout information in a single object named \texttt{layers}, such as
+Layers layout is specified in the provided Table~\ref{tab:baseline-layout}. In order to obtain such layout, the students organized the network layout information in a single object named \texttt{layers}, such as
 
 \begin{lstlisting}
 layers = [
@@ -208,7 +211,7 @@ layers = [
 
 \end{lstlisting}
 
-A peculiar aspects of this representation is the weights initialization, which is handled by the function handle \texttt{@(sz) randn(sz)*0.01}, which should yield proper random numbers for normally-distributed weights initialization with standard deviation $0.01$. 
+A peculiar aspect of this representation is the weights initialization, which is handled by the function handle \texttt{@(sz) randn(sz)*0.01}, which should yield proper random numbers for normally-distributed weights initialization with standard deviation $0.01$. 
 
 Similarly, \texttt{@(sz) zeros(sz)} will generate the null vectors required to initialize the biases.
 
@@ -287,11 +290,12 @@ With the goal of avoiding overfitting, a lower \texttt{MaxEpoch} value (for inst
 
 Fine-tune the initial learning rate required manual trials along with manual inspection. Values of $0.1$, $0.01$, $0.001$ and $0.0001$ (representatives of various order of magnitude) were tried. Only values in the neighborhood of $0.001$ gave the required performance of around $30\%$. Since the default \texttt{MaxEpoch} value of $30$ led to overfitting, a lower number should be set.
 
-In particular, testing the network $5$ times, with an optimal initial learning rate of $0.0005$, $0.001$, $0.0015$ and $8$ epochs, collecting the accuracy of each run and averaging the results returned the following Table,
+In particular, testing the network $5$ times, with an optimal initial learning rate of $0.0005$, $0.001$, $0.0015$ and $8$ epochs, collecting the accuracy of each run and averaging the results returned the following Table~\ref{tab:baseline-accuracy},
 
 \bigskip
 
-\begin{center}
+\begin{table}[ht]
+\centering
 \begin{tabular}{|c|c|c|c|}
 \hline 
 \textbf{Initial learning rate} & \textbf{Average of validation accuracy} & \textbf{Average of test set accuracy} & \textbf{Epochs} \\
@@ -303,13 +307,16 @@ $0.001$ & $0.2766$ & $0.2623$ & $8$ \\
 $0.0015$ & $0.2800$ & $0.2919$ & $8$ \\
 \hline
 \end{tabular}
-\end{center}
+\caption{Evaluating accuracy for different baseline networks.}\label{tab:baseline-accuracy}
+\end{table}
 \bigskip
 
 Apparently, the baseline network of choice should be the third one with an initial learning rate of $0.0015$. However, the comparison is unfair since that network manifests signs of overfitting beginning with the Epoch $8$. To compare those two networks the group decided to lower the number of Epochs for the third network, and repeat the training:
 
 \bigskip
-\begin{center}
+
+\begin{table}[ht]
+\centering
 \begin{tabular}{|c|c|c|c|}
 \hline 
 \textbf{Initial learning rate} & \textbf{Average of validation accuracy} & \textbf{Average of test set accuracy} & \textbf{Epochs} \\
@@ -319,16 +326,18 @@ $0.001$ & $0.2766$ & $0.2623$ & $8$\\
 $0.0015$ & $0.2800$ & $0.2664$ & $7$\\
 \hline
 \end{tabular}
-\end{center}
+\caption{Evaluating accuracy for different baseline networks, with no overfitting.}\label{tab:baseline-accuracy-no-overfitting}
+\end{table}
 \bigskip
 
-where in this case the choice makes no real difference with respect to the average of test set accuracy. To keep the baseline as simple as possible, the students decided to elect the first network as the \emph{baseline}, with parameters as following:
+where in this case the choice makes no real difference with respect to the average of test set accuracy. To keep the baseline as simple as possible, the students decided to elect the first network as the \emph{baseline}, with parameters as in following Table~\ref{tab:baseline-parameters}:
 
 \bigskip
-\begin{center}
+\begin{table}[ht]
+\centering
 \begin{tabular}{|c|c|}
 \hline 
-\textbf{Baseline parameter} & \textbf{Value} \\
+\textbf{Parameter} & \textbf{Value} \\
 \hline \hline 
 Optimization Algorithm & sgdm \\
 \hline 
@@ -343,7 +352,8 @@ Weights initialization & Gaussian with $\mu = 0$ and $\sigma = 0.01$\\
 Bias initialization & $0$\\
 \hline
 \end{tabular}
-\end{center}
+\caption{Baseline parameters.}\label{tab:baseline-parameters}
+\end{table}
 \bigskip
 
 \subsection{Baseline training progress and confusion matrix}
@@ -490,12 +500,13 @@ In order to let the network have enough room for complexity, a \texttt{MaxEpoch}
 
 \subsubsection{Results}\label{sec:results}
 
-Overall network layout is illustrated in the following Table:
+Overall network layout is illustrated in the following Table~\ref{tab:improved-network-layout}:
 
-\begin{center}
+\begin{table}[ht]
+\centering
 \begin{tabular}{|c|c|c|}
 \hline 
-\textbf{Improved Network Layout} & \textbf{Layer type} & \textbf{Size and parameters} \\
+\textbf{\#} & \textbf{Layer type} & \textbf{Size and parameters} \\
 \hline \hline 
 1 & Image input & $64 \times 64 \times 1$ images \\
 \hline 
@@ -536,16 +547,18 @@ Overall network layout is illustrated in the following Table:
 19 & Classification & crossentropyex \\
 \hline
 \end{tabular}
-\end{center}
+\caption{Improved Network layout.}\label{tab:improved-network-layout}
+\end{table}
 \bigskip
 
-while training options are listed below,
+while training options are listed in the table below,
 
 \bigskip
-\begin{center}
+\begin{table}[ht]
+\centering
 \begin{tabular}{|c|c|}
 \hline 
-\textbf{Improved Network parameter} & \textbf{Value} \\
+\textbf{Parameter} & \textbf{Value} \\
 \hline \hline 
 Optimization Algorithm & sgdm \\
 \hline 
@@ -560,7 +573,8 @@ Weights initialization & Gaussian with $\mu = 0$ and $\sigma = 0.01$\\
 Bias initialization & $0$\\
 \hline
 \end{tabular}
-\end{center}
+\caption{Improved Network parameters.}\label{tab:improved-network-parameters}
+\end{table}
 \bigskip
 
 
@@ -593,7 +607,7 @@ In particular,
 
 The students collected pictures of training progress and relative confusion matrix of both \emph{baseline network} (parameters in Section~\ref{sec:baseline-parameters}) and \emph{improved network} (parameters in Section~\ref{sec:results}).
 
-Figure~\ref{fig:comparison-confusion} shows that classes that had been better predicted by the baseline network are still among those better predicted by the improved network too (for instance, \emph{Street} and \emph{TallBuilding}), while some other classes that were initially difficult have seen a huge improvement (\emph{Bedroom} class, \emph{Forest} class, \emph{Kitchen} class).
+Figure~\ref{fig:comparison-confusion} shows that classes that had been better predicted by the baseline network are still among those better predicted by the improved network too (for instance, \emph{Street} and \emph{TallBuilding}), while some other classes that were initially difficult have seen a huge improvement (\emph{Bedroom}, \emph{Forest}, \emph{Kitchen}).
 
 In general, the improved network shows significant better performance when compared to the baseline network (an almost doubled accuracy on both validation and test set), at the cost of added complexity and some more training time required. Other variants of the improved network were tried by varying parameters and layout as described in Section~\ref{sec:no-benefits}, but no significant accuracy improvements justified the applied changes.
 
@@ -613,17 +627,17 @@ In general, the improved network shows significant better performance when compa
 
 \clearpage
 
-\subsection{Ensamble network based on previous improvements}
+\subsection{Ensemble network based on previous improvements}
 
-The students implemented an \textbf{ensamble network}, composed of $5$ networks of the same layout as in Section~\ref{sec:results}. In order to assign the class, a \emph{voting} system has been built: each network of the ensamble casts a vote (a class), and the overall output is the \emph{most common predicted class} among the ensamble.
+The students implemented an \textbf{ensemble network}, composed of $5$ networks of the same layout as in Section~\ref{sec:results}. In order to assign the class, a \emph{voting} system has been built: each network of the ensemble casts a vote (a class), and the overall output is the \emph{most common predicted class} among the ensemble.
 
-The code related to the ensamble prediction is the following one,
+The code related to the ensemble prediction is the following one,
 
 \begin{lstlisting}
-% Evaluating ensamble network accuracy
+% Evaluating ensemble network accuracy
 
-EnsambleNum=5;
-for i=1:EnsambleNum
+EnsembleNum=5;
+for i=1:EnsembleNum
     YPred = classify(net(i),imdsTest);
     for j=1:size(YPred)
         YPredicted(j,i) = YPred(j);
@@ -641,18 +655,19 @@ figure
 plotconfusion(YTest, predicted_output')
 \end{lstlisting}
 
-where \texttt{net(i)} is a network belonging to an array of $5$ trained networks. As a result, the above code will plot a confusion matrix for the ensamble network.
+where \texttt{net(i)} is a network belonging to an array of $5$ trained networks. As a result, the above code will plot a confusion matrix for the ensemble network.
 
 \subsection{Justifying the added complexity}
 
-Ensamble training is very heavy on resources. Time training multiple networks is significantly higher than the time required for training a single network, let alone the time necessary for both training and classifying with an ensamble of networks. Hence, the students questioned themselves whether an ensamble of more networks (for instance, $10$ networks or more) could bring any improvement with respect to an ensamble of $5$ or less.
+Ensemble training is very heavy on resources. Time training multiple networks is significantly higher than the time required for training a single network, let alone the time necessary for both training and classifying with an ensemble of networks. Hence, the students questioned themselves whether an ensemble of more networks (for instance, $10$ networks or more) could bring any improvement with respect to an ensemble of $5$ or less.
 
-In order to answer the question, the students collected test accuracy of ensamble networks of different number $B$ of networks, and compared them with the average of every single network in the ensamble. Each ensamble network has been trained separately, and results has been collected in the following table.
+In order to answer the question, the students collected test accuracy of ensemble networks of different number $B$ of networks, and compared them with the average of every single network in the ensemble. Each ensemble network has been trained separately, and results has been collected in the following Table~\ref{tab:ensemble-evaluation},
 
-\begin{center}
+\begin{table}[ht]
+\centering
 \begin{tabular}{|c||c|c|c|}
 \hline
-\textbf{B} & \textbf{Single networks average accuracy} & \textbf{Ensamble test set accuracy} & \textbf{Net improvement}\\
+\textbf{B} & \textbf{Single networks average accuracy} & \textbf{Ensemble test set accuracy} & \textbf{Net improvement}\\
 \hline
 \hline
 3 & $0.5763$ & $0.5950$ & $1.87\%$ \\
@@ -666,13 +681,14 @@ In order to answer the question, the students collected test accuracy of ensambl
 15 & $0.5871$ & $0.6470$ & $5.99\%$\\
 \hline
 \end{tabular}
-\end{center}
+\caption{Ensemble network accuracy evaluation.}\label{tab:ensemble-evaluation}
+\end{table}
 
-Basically, training an ensamble of $B=5$ networks should be enough to provide tangible benefits, with even higher improvements over the single networks when training a $B=10$ ensamble network (although the improvements are not so pronounced).
+Basically, training an ensemble of $B=5$ networks should be enough to provide tangible benefits, with even higher improvements over the single networks when training a $B=10$ ensemble network (although the improvements are not so pronounced).
 
-Training the network with $B=15$ only introduced a moderate improvement, thus such a high number of networks is not strictly required and would instead offer more disadvantages than advantages (for instance, training and classification time) with respect to an ensamble network having only $5$ or $10$ networks.
+Training the network with $B=15$ only introduced a moderate improvement, thus such a high number of networks is not strictly required and would instead offer more disadvantages than advantages (for instance, training and classification time) with respect to an ensemble network having only $5$ or $10$ networks.
 
-At every run, ensamble networks had shown more accuracy on the test set with respect to the single network. In addition, the single network performance is very unreliable, largely depending on the randomness of the learning phase, with test set accuracy values ranging from $55\%$ to over $60\%$ \--- on contrary, the ensamble network accuracy has proven to be much more reliable over different runs. On this particular task, ensamble learning has proven to be effective \--- however, its increased complexity and time required for training and classification cannot be undervalued. A good trade-off between net~improvement and increased complexity could be a choice of $B=5$ networks for the ensamble network, which should bring the accuracy of the student's proposed model well-above $60\%$.
+At every run, ensemble networks had shown more accuracy on the test set with respect to the single network. In addition, the single network performance is very unreliable, largely depending on the randomness of the learning phase, with test set accuracy values ranging from $55\%$ to over $60\%$ \--- on contrary, the ensemble network accuracy has proven to be much more reliable over different runs. On this particular task, ensemble learning has proven to be effective \--- however, its increased complexity and time required for training and classification cannot be undervalued. A good trade-off between net~improvement and increased complexity could be a choice of $B=5$ networks for the ensemble network, which should bring the accuracy of the student's proposed model well-above $60\%$.
  
 \section{Adopting transfer learning with AlexNet}
 
