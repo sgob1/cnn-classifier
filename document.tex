@@ -80,7 +80,7 @@ Specific MATLAB Toolbox were needed \--- the project should require \emph{Deep L
 
 
 
-\section{Training a baseline network}
+\section{Training a baseline network}\label{sec:baseline-network}
 
 The first step was the building of a baseline network (a shallow network), whose layout had been assigned by the Teacher. In practice, this phase required to strictly follow given requirements in order to obtain \emph{an overall test accuracy of around} $30\%$.
 
@@ -280,7 +280,7 @@ Training the network with an initial learning rate of $0.001$ and leaving the de
 \begin{figure}[ht]
         \centering
         \includegraphics[ width=1.0\linewidth, height=\textheight, keepaspectratio]{./pics/maxepoch-overfitting.png}
-        \caption{Overfitting of the network when \texttt{MaxEpoch} is the default value of $30$.}
+        \caption{Overfitting of the network when \texttt{MaxEpoch} is the default value of $30$. Overfitting is clearly visible after epoch $8$, and becomes very relevant after epoch $10$.}
         \label{fig:maxepoch-overfitting}
 \end{figure}
 
@@ -602,6 +602,8 @@ In particular,
     \item adding any convolutional layer did not result in performance improvements.
 \end{itemize}
 
+The students didn't investigate whether these improvements could bring performance improvements for any network \--- instead, the group only evaluated accuracy after having applied all the changes discussed in the previous sections.
+
 
 \subsection{Comparison with the baseline}\label{sec:baseline-comparison}
 
@@ -627,7 +629,7 @@ In general, the improved network shows significant better performance when compa
 
 \clearpage
 
-\subsection{Ensemble network based on previous improvements}
+\subsection{Ensemble network based on previous improvements}\label{sec:ensamble-network}
 
 The students implemented an \textbf{ensemble network}, composed of $5$ networks of the same layout as in Section~\ref{sec:results}. In order to assign the class, a \emph{voting} system has been built: each network of the ensemble casts a vote (a class), and the overall output is the \emph{most common predicted class} among the ensemble.
 
@@ -691,9 +693,9 @@ Training the network with $B=15$ only introduced a moderate improvement, thus su
 At every run, ensemble networks had shown more accuracy on the test set with respect to the single network. In addition, the single network performance is very unreliable, largely depending on the randomness of the learning phase, with test set accuracy values ranging from $55\%$ to over $60\%$ \--- on contrary, the ensemble network accuracy has proven to be much more reliable over different runs. On this particular task, ensemble learning has proven to be effective \--- however, its increased complexity and time required for training and classification cannot be undervalued. A good trade-off between net~improvement and increased complexity could be a choice of $B=5$ networks for the ensemble network, which should bring the accuracy of the student's proposed model well-above $60\%$.
  
 \section{Adopting transfer learning with AlexNet}
-\subsection{Transfer learning by freezing weights}
+\subsection{Transfer learning by freezing weights}\label{sec:transfer-learning-1}
 
-In the third section, the students were required to adopt transfer learning based on a pre-trained network. The network of choice has beed \emph{AlexNet}: the first $22$ layers of the network have been preserved, while only the last $3$ were replaced by the last $3$ layers of the improved network. Moreover, since the goal of transfer learning should be to adopt a pre-trained network with no further learning of its layers, the weights of the AlexNet layers have been freezed, preventing them to be modified during the learning phase. 
+In the third section, the students were required to adopt transfer learning based on a pre-trained network. The network of choice has been \emph{AlexNet}: the first $22$ layers of the network have been preserved, while only the last $3$ were replaced by the last $3$ layers of the improved network. Moreover, since the goal of transfer learning should be to adopt a pre-trained network with no further learning of its layers, the weights of the AlexNet layers have been freezed, preventing them to be modified during the learning phase. 
 
 The layout of the transfer learning network is described in Table~\ref{tab:transfer-learning-layout-1}:
 
@@ -800,7 +802,7 @@ The training of the network provided an accuracy of $84.44\%$ in the validation 
 \begin{figure}[ht]
         \centering
         \includegraphics[ width=1.0\linewidth, height=\textheight, keepaspectratio]{./pics/transfer-learning-progress-1.png}
-        \caption{Progress of the transfer learning network, employing AlexNet.}
+        \caption{Progress of the transfer learning network, employing AlexNet with the last $3$ layers modified.}
         \label{fig:transfer-learning-progress-1}
 \end{figure}
 
@@ -808,15 +810,65 @@ The training of the network provided an accuracy of $84.44\%$ in the validation 
 \begin{figure}[ht]
         \centering
         \includegraphics[ width=1.0\linewidth, height=\textheight, keepaspectratio]{./pics/transfer-learning-confusion-1.png}
-        \caption{Confusion matrix of the transfer learning network.}
+        \caption{Confusion matrix of the transfer learning network with last layers modified.}
         \label{fig:transfer-learning-confusion-1}
 \end{figure}
 
 \clearpage
 
 
+\subsection{AlexNet as feature extractor}\label{sec:transfer-learning-2}
 
+AlexNet could be employed as a \emph{feature extractor}. By accessing the activation of an intermediate layer, it should be possible to extract the features that could be used to train a SVM classifier. The students extracted the activation of the latest convolutional layer in AlexNet (\texttt{'fc7'}) and trained a multiclass SVM classifier employing Error-Correcting Output Codes.
 
-\subsection{AlexNet as feature extractor}
+The code should be the following,
+
+\begin{lstlisting}
+net = alexnet;
+
+featuresTrain = activations(net,imdsTrain,'fc7','OutputAs','rows');
+YTrain = imdsTrain.Labels;
+classifier = fitcecoc(featuresTrain, YTrain);
+
+TestDatasetPath = fullfile('dataset','test');
+imdsTest = imageDatastore(TestDatasetPath, ...
+    'IncludeSubfolders',true,'LabelSource','foldernames');
+imdsTest.ReadFcn = @(x)imresize(cat(3, imread(x), imread(x), imread(x)), [227 227]);
+YTest = imdsTest.Labels;
+featuresTest = activations(net,imdsTest,'fc7', 'OutputAs','rows');
+YPredicted = predict(classifier, featuresTest);
+figure
+plotconfusion(YTest,YPredicted)
+\end{lstlisting}
+
+where the last instruction should plot a confusion matrix such as the one in Figure~\ref{fig:transfer-learning-confusion-svm}.
+
+\begin{figure}[ht]
+        \centering
+        \includegraphics[ width=1.0\linewidth, height=\textheight, keepaspectratio]{./pics/transfer-learning-confusion-svm.png}
+        \caption{Confusion matrix of the transfer learning network. This time, AlexNet worked as a feature extractor (up to the last convolutional layer), while the classification task is reserved to a SVM.}
+        \label{fig:transfer-learning-confusion-svm}
+\end{figure}
+
+The test set accuracy stands at a $87.6\%$, a result that is comparable to the one obtained in Section~\ref{sec:transfer-learning-1}.
+
+\clearpage
+
+\section{Summary of results}
+
+The students implemented a total of $5$ notable Convolutional Neural Networks,
+
+\begin{enumerate}
+    \item the \textbf{baseline network} in Section~\ref{sec:baseline-network};
+    \item the \textbf{improved network} in Section~\ref{sec:improved-network};
+    \item the \textbf{ensemble network} in Section~\ref{sec:ensamble-network};
+    \item a network implementing \textbf{transfer learning} by substituting the last $3$ layers of AlexNet (Section~\ref{sec:transfer-learning-1});
+    \item a network implementing \textbf{transfer learning} by extracting activations of the last convolutional layer of AlexNet and training a SVM (Section~\ref{sec:transfer-learning-2}).
+\end{enumerate}
+
+The first $3$ networks of the list were built from scratch: this means that everything \--- from layer selection to training \--- were completely decided by the students. The baseline network mainly served as a comparison and a starting point. The improved network almost doubled the accuracy of the baseline network, by only implementing some crucial changes (notably, data augmentation and addition of batch normalization layers were enough to improve drastically the performance of the network. Subsequent improvements refined the learning phase and granted enough benefits to double the performance of the baseline). Then, the improved network was adopted to build an ensemble network composed of $5$ of those networks. Each network was asked to classify an image; the output of the ensemble network was the most commonly predicted class. The approach granted an accuracy improvement of $4.17\%$ and much more stability of the results in the case of the improved network. The best network out of the $3$ first implemented by the students has been the ensemble network \--- however, the training time has been significantly increased by the necessity of learning multiple networks one after another.
+
+The last $2$ networks of the list were not built from scratch by the students; on contrary, the group started from a pre-trained network (AlexNet) and only implemented the last portion of it, along with the testing apparatus. The first approach was by substituting the last layers with the last ones from the improved network; the second approach, instead, simply extracted features from the last convolutional layer and trained a SVM for classification. By adopting a well-established network, both approaches ended up being successful, with a test set accuracy of, respectively, $86.4\%$ and $87.6\%$. Those two networks fully outclassed the previous ones, showing that the transfer learning approach is not only feasible, but could be a valid and quick technique to obtain a high-performance Convolutional Neural Network.
+
 
 \end{document}
