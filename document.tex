@@ -128,7 +128,7 @@ Layout of the network is described in the following Table~\ref{tab:baseline-layo
 10 & Fully Connected & $15$ \\
 \hline
 11 & Softmax & softmax \\ 
-\hline \hline 
+\hline 
 12 & Classification & crossentropyex \\
 \hline
 \end{tabular}
@@ -273,7 +273,7 @@ YTest = imdsTest.Labels;
 accuracy = sum(YPredicted == YTest) / numel(YTest);
 \end{lstlisting}
 
-\subsection{Choice of \texttt{MaxEpoch} and stopping criterion}
+\subsection{Choice of MaxEpoch and stopping criterion}
 
 Training the network with an initial learning rate of $0.001$ and leaving the default number of epochs unalterated led to evident overfitting of the network, as shown in Figure~\ref{fig:maxepoch-overfitting}.
 
@@ -407,7 +407,7 @@ The confusion matrix shows that there are some classes that are more often miscl
 
 \clearpage
 
-\section{Improving the network}
+\section{Improving the network}\label{sec:improved-network}
 
 The students propose (and have implemented) various methods in order to double the performance of the Convolutional Neural Network from the baseline $\sim 30\%$ to a $60\%$:
 
@@ -420,7 +420,7 @@ The students propose (and have implemented) various methods in order to double t
 
 Individual contribution and net improvement of each of these methods is not investigated \--- what is provided, instead, is a description of each technique's implementation along with the necessary details, a brief description of the increasing improvements \emph{at each added complexity} and a final overview of all improvements altogether with respect to the baseline. 
 
-\subsection{Data augmentation}
+\subsection{Data augmentation}\label{sec:data-augmentation}
 
 The first improvement of the network is related to \emph{data augmentation}. The students implemented \emph{left-to-right reflections} of the train set, leaving unalterated the test set required for evaluation.
 
@@ -543,7 +543,7 @@ Overall network layout is illustrated in the following Table~\ref{tab:improved-n
 17 & Fully Connected & $15$ \\
 \hline
 18 & Softmax & softmax \\
-\hline \hline 
+\hline
 19 & Classification & crossentropyex \\
 \hline
 \end{tabular}
@@ -691,7 +691,132 @@ Training the network with $B=15$ only introduced a moderate improvement, thus su
 At every run, ensemble networks had shown more accuracy on the test set with respect to the single network. In addition, the single network performance is very unreliable, largely depending on the randomness of the learning phase, with test set accuracy values ranging from $55\%$ to over $60\%$ \--- on contrary, the ensemble network accuracy has proven to be much more reliable over different runs. On this particular task, ensemble learning has proven to be effective \--- however, its increased complexity and time required for training and classification cannot be undervalued. A good trade-off between net~improvement and increased complexity could be a choice of $B=5$ networks for the ensemble network, which should bring the accuracy of the student's proposed model well-above $60\%$.
  
 \section{Adopting transfer learning with AlexNet}
+\subsection{Transfer learning by freezing weights}
+
+In the third section, the students were required to adopt transfer learning based on a pre-trained network. The network of choice has beed \emph{AlexNet}: the first $22$ layers of the network have been preserved, while only the last $3$ were replaced by the last $3$ layers of the improved network. Moreover, since the goal of transfer learning should be to adopt a pre-trained network with no further learning of its layers, the weights of the AlexNet layers have been freezed, preventing them to be modified during the learning phase. 
+
+The layout of the transfer learning network is described in Table~\ref{tab:transfer-learning-layout-1}:
+
+\bigskip
+\begin{table}[ht]
+\centering
+\begin{tabular}{|c|c|c|}
+\hline 
+\textbf{\#} & \textbf{Layer type} & \textbf{Size and parameters} \\
+\hline \hline 
+$1:22$ & AlexNet layers & weights freezed \\
+\hline 
+$23$ & Fully Connected & $15$ \\
+\hline
+$24$ & Softmax & softmax \\ 
+\hline 
+$25$ & Classification & crossentropyex \\
+\hline
+\end{tabular}
+\caption{Transfer Learning Layout}\label{tab:transfer-learning-layout-1}
+\end{table}
+\bigskip
+
+The code that produced the specified layout is the following one,
+
+\begin{lstlisting}
+net = alexnet;
+
+layersAlex = net.Layers(1:end-3);
+
+layers = [
+    layersAlex
+
+    fullyConnectedLayer(15,'Name','fc_2',...
+        'WeightsInitializer', @(sz) randn(sz)*0.01,...
+        'BiasInitializer', @(sz) zeros(sz))
+
+    softmaxLayer('Name','softmax')
+    classificationLayer('Name','output')
+];
+
+layers(1:end-3) = freezeWeights(layers(1:end-3));
+\end{lstlisting}
+
+where the function \texttt{freezeWeights} has been obtained as-is from an online git repository (\href{https://github.com/GRSEB9S/Transfer-Learning-using-Matlab/blob/master/TransferLearningUsingResNet101Example/freezeWeights.m}{URL}), and will be reported here:
+
+\begin{lstlisting}
+function layers = freezeWeights(layers)
+% layers = freezeWeights(layers) sets the learning rates of all the
+% parameters of the layers in the layer array |layers| to zero.
+
+for ii = 1:size(layers,1)
+    props = properties(layers(ii));
+    for p = 1:numel(props)
+        propName = props{p};
+        if ~isempty(regexp(propName, 'LearnRateFactor$', 'once'))
+            layers(ii).(propName) = 0;
+        end
+    end
+end
+
+end
+\end{lstlisting}
+
+\subsubsection{Input layer}
+
+The students adopted the same data augmentation techniques that has been shown in Section~\ref{sec:data-augmentation}. In order to preserve the input layer of the AlexNet (along with its subsequent structure), an input size of $227 \times 227 \times 3$ should be guaranteed. To get the correct input size students had to first modify the picture size accordingly, and then to implement a greyscale to RGB conversion. The group adopted the simple approach to replicate the greyscale image $3$ times, creating the $3$ color channels by simply providing the greyscale information to each channel.
+
+The code relative to this part is the following one,
+
+\begin{lstlisting}
+imds = imageDatastore(TrainDatasetPath, ...
+    'IncludeSubfolders',true,'LabelSource','foldernames');
+imds.ReadFcn = @(x)imresize(cat(3, imread(x), imread(x), imread(x)), [227 227]);
+trainQuota=0.85;
+[imdsTrain,imdsValidation] = splitEachLabel(imds,trainQuota,'randomize');
+aug = imageDataAugmenter("RandXReflection",true);
+imageSize = [227 227 3];
+auimds = augmentedImageDatastore(imageSize,imdsTrain,'DataAugmentation',aug);
+\end{lstlisting}
+
+Notably, the main difference with respect to the previous sections is in the \texttt{ReadFcn} definition, where the image is first replicated into the $3$ RGB channels, then rescaled to the desired size.
+
+\subsubsection{Training options}
+
+Different training options were explored. The group found out that good training options could be the following ones,
+
+\begin{lstlisting}
+options = trainingOptions('sgdm', ...
+    'MiniBatchSize',10, ...
+    'MaxEpochs',6, ...
+    'InitialLearnRate',1e-4, ...
+    'ValidationData',imdsValidation, ...
+    'ValidationFrequency',3, ...
+    'Verbose',false, ...
+    'Plots','training-progress');
+\end{lstlisting}
+
+\subsubsection{Results}
+
+The training of the network provided an accuracy of $84.44\%$ in the validation set, and of $86.4\%$ in the test set, bringing overall accuracy well-above the $60\%$ of the improved network illustrated in Section~\ref{sec:improved-network}. Corresponding training progress and confusion matrix are provided in Figure~\ref{fig:transfer-learning-progress-1} and Figure~\ref{fig:transfer-learning-confusion-1}.
 
 
+\begin{figure}[ht]
+        \centering
+        \includegraphics[ width=1.0\linewidth, height=\textheight, keepaspectratio]{./pics/transfer-learning-progress-1.png}
+        \caption{Progress of the transfer learning network, employing AlexNet.}
+        \label{fig:transfer-learning-progress-1}
+\end{figure}
+
+
+\begin{figure}[ht]
+        \centering
+        \includegraphics[ width=1.0\linewidth, height=\textheight, keepaspectratio]{./pics/transfer-learning-confusion-1.png}
+        \caption{Confusion matrix of the transfer learning network.}
+        \label{fig:transfer-learning-confusion-1}
+\end{figure}
+
+\clearpage
+
+
+
+
+\subsection{AlexNet as feature extractor}
 
 \end{document}

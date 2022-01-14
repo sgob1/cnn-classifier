@@ -7,7 +7,7 @@ trainQuota=0.85;
 [imdsTrain,imdsValidation] = splitEachLabel(imds,trainQuota,'randomize');
 aug = imageDataAugmenter("RandXReflection",true);
 imageSize = [227 227 3];
-auimds = augmentedImageDatastore(imageSize,imdsTrain,'DataAugmentation',aug,'ColorPreprocessing','gray2rgb');
+auimds = augmentedImageDatastore(imageSize,imdsTrain,'DataAugmentation',aug);
 
 net = alexnet;
 %analyzeNetwork(net);
@@ -24,7 +24,9 @@ layers = [
 
     softmaxLayer('Name','softmax')
     classificationLayer('Name','output')
-    ];
+];
+
+layers(1:end-3) = freezeWeights(layers(1:end-3));
 
 lgraph = layerGraph(layers); % to run the layers need a name
 %analyzeNetwork(lgraph)
@@ -33,10 +35,38 @@ options = trainingOptions('sgdm', ...
     'MiniBatchSize',10, ...
     'MaxEpochs',6, ...
     'InitialLearnRate',1e-4, ...
-    'Shuffle','every-epoch', ...
     'ValidationData',imdsValidation, ...
     'ValidationFrequency',3, ...
     'Verbose',false, ...
     'Plots','training-progress');
 
 netTransfer = trainNetwork(imdsTrain,layers,options);
+
+
+TestDatasetPath = fullfile('dataset','test');
+imdsTest = imageDatastore(TestDatasetPath, ...
+    'IncludeSubfolders',true,'LabelSource','foldernames');
+imdsTest.ReadFcn = @(x)imresize(cat(3, imread(x), imread(x), imread(x)), [227 227]);
+
+YPredicted = classify(netTransfer,imdsTest);
+YTest = imdsTest.Labels;
+
+figure
+plotconfusion(YTest,YPredicted)
+
+
+function layers = freezeWeights(layers)
+% layers = freezeWeights(layers) sets the learning rates of all the
+% parameters of the layers in the layer array |layers| to zero.
+
+for ii = 1:size(layers,1)
+    props = properties(layers(ii));
+    for p = 1:numel(props)
+        propName = props{p};
+        if ~isempty(regexp(propName, 'LearnRateFactor$', 'once'))
+            layers(ii).(propName) = 0;
+        end
+    end
+end
+
+end
