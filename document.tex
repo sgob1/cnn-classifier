@@ -584,15 +584,9 @@ Training progress and confusion matrix, along with a comparison with the baselin
 
 \subsection{Parameters and layout enhancements that did not provide benefit}\label{sec:no-benefits}
 
-Students chose the simplest network among many others that did not bring much of an improvement. The choice of the simplest network has been determined by three factors:
+Students chose the simplest network among many others that did not bring much of an improvement. The choice of the network has been determined by considering the accuracy, the complexity of the network, and the similarity with the baseline. If the network accuracy didn't improve, then it shouldn't be more complex with added pieces. Among all those objectives, the student preferred networks with higher accuracy and complexity as lower as possible. In those cases where two networks were comparable, students preferred the network that was the most similar to the baseline with respect to learning parameters and layout.
 
-\begin{enumerate}
-    \item the network should have a higher overall accuracy when compared to others;
-    \item if not, the network should not see its complexity increased with no tangible benefit performance-wise;
-    \item if not, the network should be as much comparable as possible to the baseline (it should share the same parameters as much as possible).
-\end{enumerate}
-
-With this two fundamental goals in mind, the students discarded other configurations which did not result in significant improvements performance-wise, or introduced higher complexity, with less parameters shared between the improved network and the baseline.
+With these fundamental goals in mind, the students discarded other configurations which did not result in significant improvements performance-wise, or introduced higher complexity, with less parameters shared between the improved network and the baseline.
 
 In particular,
 
@@ -602,7 +596,7 @@ In particular,
     \item adding any convolutional layer did not result in performance improvements.
 \end{itemize}
 
-The students didn't investigate whether these improvements could bring performance improvements for any network \--- instead, the group only evaluated accuracy after having applied all the changes discussed in the previous sections.
+The students didn't investigate whether these improvements could bring performance improvements for any network \--- instead, the group only evaluated accuracy for the network after having applied all the changes discussed in the previous sections. Basically, none of the above modifications led to a significant performance improvement worth keeping.
 
 
 \subsection{Comparison with the baseline}\label{sec:baseline-comparison}
