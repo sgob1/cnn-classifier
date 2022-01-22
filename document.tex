@@ -275,7 +275,7 @@ accuracy = sum(YPredicted == YTest) / numel(YTest);
 
 \subsection{Choice of MaxEpoch and stopping criterion}
 
-Training the network with an initial learning rate of $0.001$ and leaving the default number of epochs unalterated led to evident overfitting of the network, as shown in Figure~\ref{fig:maxepoch-overfitting}.
+Training the network with an initial learning rate of $0.001$ and leaving the default number of epochs ($30$) unalterated led to evident overfitting of the network, as shown in Figure~\ref{fig:maxepoch-overfitting}.
 
 \begin{figure}[ht]
         \centering
@@ -284,53 +284,13 @@ Training the network with an initial learning rate of $0.001$ and leaving the de
         \label{fig:maxepoch-overfitting}
 \end{figure}
 
-With the goal of avoiding overfitting, a lower \texttt{MaxEpoch} value (for instance $8$) should be adopted.
+With the goal of avoiding overfitting, a lower \texttt{MaxEpoch} value (for instance $8$) should be adopted. The value has been obtained by repeatedly testing the network with different values.
 
 \subsection{Fine-tuning initial learning rate}\label{sec:baseline-parameters}
 
-Fine-tune the initial learning rate required manual trials along with manual inspection. Values of $0.1$, $0.01$, $0.001$ and $0.0001$ (representatives of various order of magnitude) were tried. Only values in the neighborhood of $0.001$ gave the required performance of around $30\%$. Since the default \texttt{MaxEpoch} value of $30$ led to overfitting, a lower number should be set.
+Fine-tune the initial learning rate required manual trials along with manual inspection. Values of $0.1$, $0.01$, $0.001$ and $0.0001$ (representatives of various order of magnitude) were tried. Only values in the neighborhood of $0.001$ gave the required performance of around $30\%$. 
 
-In particular, testing the network $5$ times, with an optimal initial learning rate of $0.0005$, $0.001$, $0.0015$ and $8$ epochs, collecting the accuracy of each run and averaging the results returned the following Table~\ref{tab:baseline-accuracy},
-
-\bigskip
-
-\begin{table}[ht]
-\centering
-\begin{tabular}{|c|c|c|c|}
-\hline 
-\textbf{Initial learning rate} & \textbf{Average of validation accuracy} & \textbf{Average of test set accuracy} & \textbf{Epochs} \\
-\hline \hline 
-$0.0005$ & $0.2258$ & $0.1970$ & $8$ \\
-\hline
-$0.001$ & $0.2766$ & $0.2623$ & $8$ \\
-\hline 
-$0.0015$ & $0.2800$ & $0.2919$ & $8$ \\
-\hline
-\end{tabular}
-\caption{Evaluating accuracy for different baseline networks.}\label{tab:baseline-accuracy}
-\end{table}
-\bigskip
-
-Apparently, the baseline network of choice should be the third one with an initial learning rate of $0.0015$. However, the comparison is unfair since that network manifests signs of overfitting beginning with the Epoch $8$. To compare those two networks the group decided to lower the number of Epochs for the third network, and repeat the training:
-
-\bigskip
-
-\begin{table}[ht]
-\centering
-\begin{tabular}{|c|c|c|c|}
-\hline 
-\textbf{Initial learning rate} & \textbf{Average of validation accuracy} & \textbf{Average of test set accuracy} & \textbf{Epochs} \\
-\hline \hline 
-$0.001$ & $0.2766$ & $0.2623$ & $8$\\
-\hline 
-$0.0015$ & $0.2800$ & $0.2664$ & $7$\\
-\hline
-\end{tabular}
-\caption{Evaluating accuracy for different baseline networks, with no overfitting.}\label{tab:baseline-accuracy-no-overfitting}
-\end{table}
-\bigskip
-
-where in this case the choice makes no real difference with respect to the average of test set accuracy. To keep the baseline as simple as possible, the students decided to elect the network with initial learning rate of $0.001$ as the \emph{baseline}, with parameters as in following Table~\ref{tab:baseline-parameters}:
+The students decided to elect the network with initial learning rate of $0.001$ as the \emph{baseline}, with parameters as in following Table~\ref{tab:baseline-parameters}:
 
 \bigskip
 \begin{table}[ht]
