@@ -13,7 +13,7 @@
 \usepackage{color} % Allows defining colors for code snippets
 \usepackage{setspace} % Sets leading
 \usepackage{parskip}
-\usepackage[a4paper, inner=0.5cm, outer=0.5cm, lmargin=2.1cm, rmargin=2.1cm, tmargin=2.5cm, bmargin=2.1cm]{geometry} % Sets margins and borders
+\usepackage[a4paper, inner=0.5cm, outer=0.5cm, lmargin=2.1cm, rmargin=2.1cm, tmargin=1.8cm, bmargin=2.1cm]{geometry} % Sets margins and borders
 
 \usepackage{listings}
 \definecolor{dkgreen}{rgb}{0.1,0.5,0.1}
@@ -73,7 +73,7 @@ This paper had 3 goals of increasing difficulty:
 
 Students adopted the programming language and numeric computing environment \textbf{MATLAB} as both text editor and simulation software to describe, implement and build the trained networks. 
 
-Specific MATLAB Toolbox were needed \--- the project should require \emph{Deep Learning Toolbox}, \emph{Computer Vision Toolbox} and \emph{Image Processing Toolbox}. Optionally, to improve processing speed during the Convolutional Neural Network build phase, students installed and enabled the \emph{Parallel Computing Toolbox}.
+Specific MATLAB Toolbox were needed \--- the project should require \emph{Deep Learning Toolbox} (along with \emph{Deep Learning Toolbox Model for AlexNet Network}), \emph{Computer Vision Toolbox}, \emph{Image Processing Toolbox}, and \emph{Statistics and Machine Learning Toolbox}. Optionally, to improve processing speed during the Convolutional Neural Network build phase, students installed and enabled the \emph{Parallel Computing Toolbox}.
 
 
 
@@ -86,9 +86,9 @@ The first step was the building of a baseline network (a shallow network), whose
 
 \subsection{Importing the dataset} 
 
-The training dataset comprises $1500$ images, of 15 categories (office, kitchen, living room, bedroom, store, industrial, tall building, inside city, street, highway, coast, open country, mountain, forest, suburb). Each photo lies inside a directory, whose name denotes the category. Similarly, the test dataset comprises $2985$ pictures lying in the same categories.
+The training dataset comprises $1500$ images, of 15 categories (office, kitchen, living room, bedroom, store, industrial, tall building, inside city, street, highway, coast, open country, mountain, forest, suburb). Each photo lies inside a directory, whose name denotes the category. Similarly, the test dataset comprises $2985$ pictures lying in the same categories as above.
 
-In order to import the dataset into an \emph{image datastore} object, students used following instructions,
+In order to import the dataset into an \emph{image datastore} object, students used the following instructions,
 
 \begin{lstlisting}
 TrainDatasetPath = fullfile('dataset', 'train');
@@ -156,7 +156,7 @@ trainQuota=0.85;
 [imdsTrain, imdsValidation] = splitEachLabel(imds, trainQuota, 'randomize');
 \end{lstlisting}
 
-These instructions were sufficient to obtain two, distinct, datasets \--- the first one for training, the second one for validation. Images should be elected and put in the datasets according to a random process; despite that, \texttt{splitEachLabel} function should assure that the same quota of $0.85$ for training sets was maintained across all $15$ labels.
+These instructions were sufficient to obtain two, distinct, datasets \--- the first one for training, the second one for validation. Images should be elected and put in the datasets according to a random process; despite that, \texttt{splitEachLabel} function should assure that the same quota of $0.85$ for training sets has been maintained across all $15$ labels.
 
 \subsection{Resizing images}
 
@@ -166,7 +166,7 @@ In order to resize images to match the requested size of $64 \times 64$, student
 imds.ReadFcn = @(x)imresize(imread(x), [64 64]);
 \end{lstlisting}
 
-This command should overload the \texttt{ReadFcn} function inside \texttt{imds}, so that instead of simply reading images they should be resized too.
+This command should overload the \texttt{ReadFcn} function in \texttt{imds}, so that instead of simply reading images they should be resized too.
 
 \subsection{Layers definition}
 
@@ -273,9 +273,11 @@ YTest = imdsTest.Labels;
 accuracy = sum(YPredicted == YTest) / numel(YTest);
 \end{lstlisting}
 
+where a test dataset should have been created with the same size and characteristics of the training set. The last portion of the snippet realized the prediction phase and the accuracy evaluation.
+
 \subsection{Choice of MaxEpoch and stopping criterion}
 
-Training the network with an initial learning rate of $0.001$ and leaving the default number of epochs ($30$) unalterated led to evident overfitting of the network, as shown in Figure~\ref{fig:maxepoch-overfitting}.
+Training the network with an initial learning rate of $0.001$ and leaving the default number of epochs~($30$) unalterated led to evident overfitting of the network, as shown in Figure~\ref{fig:maxepoch-overfitting}.
 
 \begin{figure}[ht]
         \centering
@@ -327,7 +329,7 @@ The overall training progress for the baseline network is shown in Figure~\ref{f
         \label{fig:baseline-progress}
 \end{figure}
 
-To obtain the \emph{confusion matrix} for the chosen baseline network, the students ran the following code to first train the network again, and then plot a confusion matrix as shown in Figure~\ref{fig:baseline-confusion},
+To obtain the \emph{confusion matrix} for the chosen baseline network, the students ran the following code to first train the network, and then plot a confusion matrix as shown in Figure~\ref{fig:baseline-confusion},
 
 \begin{lstlisting}
 InitialLearningRate = 0.001;
@@ -363,13 +365,15 @@ plotconfusion(YTest,YPredicted)
         \label{fig:baseline-confusion}
 \end{figure}
 
-The confusion matrix shows that there are some classes that are more often misclassified (\texttt{kitchen}, \texttt{industrial}) and some classes that instead are less often misclassified, such as \texttt{highway} and \texttt{street}. Overall accuracy stands at the value $28.9\%$: from this point of view, the baseline should represent an improvement from a completely random classifier, whose performance with respect to this classification task is less than~a~$7\%$.
+The confusion matrix shows that there are some classes that are more often misclassified (\emph{Kitchen}, \emph{Industrial}, \emph{Bedroom}, \emph{Forest}) and some classes that instead are less often misclassified, such as \emph{Coast}, \emph{Highway}, \emph{Office}, \emph{Street} and \emph{Suburb}. Overall accuracy stands at the value $28.9\%$: from this point of view, the baseline should represent an improvement from a completely random classifier, whose performance with respect to this classification task is less than~a~$7\%$.
+
+The overall code of the baseline network can be read in \texttt{baseline\_network.m} file.
 
 \clearpage
 
 \section{Improving the network}\label{sec:improved-network}
 
-The students propose (and have implemented) various methods in order to double the performance of the Convolutional Neural Network from the baseline $\sim 30\%$ to a $60\%$:
+The students propose (and have implemented) various methods in order to almost double the performance of the Convolutional Neural Network from the baseline $\sim 30\%$ to a $60\%$:
 
 \begin{enumerate}
     \item \emph{data augmentation};
@@ -378,7 +382,7 @@ The students propose (and have implemented) various methods in order to double t
     \item modifying network layout;
 \end{enumerate}
 
-Individual contribution and net improvement of each of these methods is not investigated \--- what is provided, instead, is a description of each technique's implementation along with the necessary details, a brief description of the increasing improvements \emph{at each added complexity} and a final overview of all improvements altogether with respect to the baseline. 
+Individual contribution and net improvement of each of these methods is not investigated \--- what is provided, instead, is a description of each technique's implementation along with the necessary details, a brief description of the increasing improvements \emph{at each new addition} and a final overview of all improvements altogether with respect to the baseline.
 
 \subsection{Data augmentation}\label{sec:data-augmentation}
 
@@ -393,7 +397,7 @@ auimds = augmentedImageDatastore(imageSize,imdsTrain,'DataAugmentation',aug);
 aunet = trainNetwork(auimds,layers,options);
 \end{lstlisting}
 
-with the same options as the baseline, but \texttt{MaxEpoch} set to $15$ (this kind of training resulted somehow to be slower), returned a validation accuracy of around $\sim 39\%$. Hence, the added complexity represented a slight improvement from the previous step.
+with the same options as the baseline, but \texttt{MaxEpoch} set to $15$ (this kind of training resulted to be slower), returned a validation accuracy of around $\sim 39\%$. Hence, the added complexity represented a remarkable improvement from the previous step.
 
 \subsection{Batch normalization}
 
@@ -405,7 +409,7 @@ batchNormalizationLayer('Name','BN_1')
 
 before any ReLU layer. The name of the new layers should be changed accordingly to the position of those layers.
 
-The added complexity resulted in a faster learning (a lower MaxEpoch number should be set, from $15$ to $6$) and a much higher accuracy ($51.11\%$ on validation set, $48.7\%$ on test data).
+The added complexity resulted in a faster learning (a lower MaxEpoch number should be set, from $15$ to $6$) and a much higher accuracy ($51.11\%$ on validation set, $48.7\%$ on test data). With this second addition, the improvements were remarkable too.
 
 \subsection{Improving convolutional layers}
 
@@ -429,7 +433,7 @@ convolution2dLayer(5,16,'Padding','same','Stride', [1 1], 'Name','conv_2',...
     'BiasInitializer', @(sz) zeros(sz))
 \end{lstlisting}
 
-This third addition brought a slight improvement, as the validation accuracy is at $55.11\%$, but the overall test accuracy stands at $50\%$.
+This third addition brought a slight improvement, as the validation accuracy is at $55.11\%$, with the overall test accuracy standing at $50\%$.
 
 \subsection{Modifying network layout}
 
@@ -558,14 +562,15 @@ In particular,
 
 The students didn't investigate whether these improvements could bring performance improvements for any network \--- instead, the group only evaluated accuracy for the network after having applied all the changes discussed in the previous sections. Basically, none of the above modifications led to a significant performance improvement worth keeping.
 
-
 \subsection{Comparison with the baseline}\label{sec:baseline-comparison}
 
 The students collected pictures of training progress and relative confusion matrix of both \emph{baseline network} (parameters in Section~\ref{sec:baseline-parameters}) and \emph{improved network} (parameters in Section~\ref{sec:results}).
 
-Figure~\ref{fig:comparison-confusion} shows that classes that had been better predicted by the baseline network are still among those better predicted by the improved network too (for instance, \emph{Street} and \emph{TallBuilding}), while some other classes that were initially difficult have seen a huge improvement (\emph{Bedroom}, \emph{Forest}, \emph{Kitchen}).
+Figure~\ref{fig:comparison-confusion} shows that classes that had been better predicted by the baseline network are still among those well predicted by the improved network too (for instance, \emph{Street} and \emph{TallBuilding}), while some other classes that were initially difficult have seen a huge improvement (\emph{Mountain}, \emph{LivingRoom}, and notably \emph{Forest} class improved from a $5.7\%$ to a $91.2\%$). Still, some classes look very hard to predict, for instance \emph{Bedroom} class and \emph{Industrial} ones.
 
 In general, the improved network shows significant better performance when compared to the baseline network (an almost doubled accuracy on both validation and test set), at the cost of added complexity and some more training time required. Other variants of the improved network were tried by varying parameters and layout as described in Section~\ref{sec:no-benefits}, but no significant accuracy improvements justified the applied changes.
+
+The overall code of the improved network can be read in \texttt{improved\_network.m} file.
 
 \begin{figure}[ht]
         \centering
@@ -644,7 +649,9 @@ Basically, training an ensemble of $B=5$ networks should be enough to provide ta
 
 Training the network with $B=15$ only introduced a moderate improvement, thus such a high number of networks is not strictly required and would instead offer more disadvantages than advantages (for instance, training and classification time) with respect to an ensemble network having only $5$ or $10$ networks.
 
-At every run, ensemble networks had shown more accuracy on the test set with respect to the single network. In addition, the single network performance is very unreliable, largely depending on the randomness of the learning phase, with test set accuracy values ranging from $55\%$ to over $60\%$ \--- on contrary, the ensemble network accuracy has proven to be much more reliable over different runs. On this particular task, ensemble learning has proven to be effective \--- however, its increased complexity and time required for training and classification cannot be undervalued. A good trade-off between net~improvement and increased complexity could be a choice of $B=5$ networks for the ensemble network, which should bring the accuracy of the student's proposed model well-above $60\%$.
+At every run, ensemble networks had shown more accuracy on the test set with respect to the single network. In addition, the single network performance varies a lot, largely depending on the randomness of the learning phase, with test set accuracy values ranging from $55\%$ to over $60\%$ \--- on contrary, the ensemble network accuracy has proven to be much more reliable over different runs. On this particular task, ensemble learning has proven to be effective \--- however, its increased complexity and time required for training and classification cannot be underestimated. A good trade-off between net~improvement and increased complexity could be a choice of $B=5$ networks for the ensemble network, which should bring the accuracy of the student's proposed model well-above $60\%$.
+
+The overall code of the ensemble network can be read in \texttt{ensemble\_improved.m} file.
  
 \section{Adopting transfer learning with AlexNet}
 \subsection{Transfer learning by freezing weights}\label{sec:transfer-learning-1}
@@ -752,6 +759,8 @@ options = trainingOptions('sgdm', ...
 
 The training of the network provided an accuracy of $84.44\%$ in the validation set, and of $86.4\%$ in the test set, bringing overall accuracy well-above the $60\%$ of the improved network illustrated in Section~\ref{sec:improved-network}. Corresponding training progress and confusion matrix are provided in Figure~\ref{fig:transfer-learning-progress-1} and Figure~\ref{fig:transfer-learning-confusion-1}.
 
+The code can be read in file \texttt{transfer\_learning.m}.
+
 
 \begin{figure}[ht]
         \centering
@@ -800,11 +809,13 @@ where the last instruction should plot a confusion matrix such as the one in Fig
 \begin{figure}[ht]
         \centering
         \includegraphics[ width=1.0\linewidth, height=\textheight, keepaspectratio]{./pics/transfer-learning-confusion-svm.png}
-        \caption{Confusion matrix of the transfer learning network. This time, AlexNet worked as a feature extractor (up to the last convolutional layer), while the classification task is reserved to a SVM.}
+        \caption{Confusion matrix of the transfer learning network. This time, AlexNet worked as a feature extractor (up to the last convolutional layer), while the classification task is reserved to a SVM that has been trained with the extracted features.}
         \label{fig:transfer-learning-confusion-svm}
 \end{figure}
 
 The test set accuracy stands at a $87.6\%$, a result that is comparable to the one obtained in Section~\ref{sec:transfer-learning-1}.
+
+The code can be read in file \texttt{transfer\_learning\_svm.m}.
 
 \clearpage
 
@@ -820,7 +831,7 @@ The students implemented a total of $5$ notable Convolutional Neural Networks,
     \item a network implementing \textbf{transfer learning} by extracting activations of the last convolutional layer of AlexNet and training a SVM (Section~\ref{sec:transfer-learning-2}).
 \end{enumerate}
 
-The first $3$ networks of the list were built from scratch: this means that everything \--- from layer selection to training \--- were completely decided by the students. The baseline network mainly served as a comparison and a starting point. The improved network almost doubled the accuracy of the baseline network, by only implementing some crucial changes (notably, data augmentation and addition of batch normalization layers were enough to improve drastically the performance of the network. Subsequent improvements refined the learning phase and granted enough benefits to double the performance of the baseline). Then, the improved network was adopted to build an ensemble network composed of $5$ of those networks. Each network was asked to classify an image; the output of the ensemble network was the most commonly predicted class. The approach granted an accuracy improvement of $4.17\%$ and much more stability of the results in the case of the improved network. The best network out of the $3$ first implemented by the students has been the ensemble network \--- however, the training time has been significantly increased by the necessity of learning multiple networks one after another.
+The first $3$ networks of the list were built from scratch: this means that everything \--- from layer selection to training \--- were completely written by the students (however, the first baseline network has been subjected to strict requirements by the Teacher). The baseline network mainly served as a comparison and a starting point. The improved network almost doubled the accuracy of the baseline network, by only implementing some crucial changes (notably, data augmentation and addition of batch normalization layers were enough to improve drastically the performance of the network. Subsequent improvements refined the learning phase and granted enough benefits to double the performance of the baseline). Then, the improved network was adopted to build an ensemble network composed of $5$ and more of those networks. Each network was asked to classify an image; the output of the ensemble network was the most commonly predicted class. The approach granted an accuracy improvement of $4.17\%$ and much more stability of the results in the case of the improved network. The best network out of the $3$ first implemented by the students has been the ensemble network \--- however, the training time has been significantly increased by the necessity of learning multiple networks one after another.
 
 The last $2$ networks of the list were not built from scratch by the students; on contrary, the group started from a pre-trained network (AlexNet) and only implemented the last portion of it, along with the testing apparatus. The first approach was by substituting the last layers with the last ones from the improved network; the second approach, instead, simply extracted features from the last convolutional layer and trained a SVM for classification. By adopting a well-established network, both approaches ended up being successful, with a test set accuracy of, respectively, $86.4\%$ and $87.6\%$. Those two networks fully outclassed the previous ones, showing that the transfer learning approach is not only feasible, but could be a valid and quick technique to obtain a high-performance Convolutional Neural Network.
 
