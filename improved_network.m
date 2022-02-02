@@ -2,15 +2,6 @@ close all
 
 TrainDatasetPath = fullfile('dataset','train');
 
-% IMPROVING 
-% using sgdm
-% Added fully connected layer
-% Added dropout layer
-% MaxEpoch 25
-% Learning rate 0.001
-% Minibatch 32
-% good improvements
-
 imds = imageDatastore(TrainDatasetPath, ...
     'IncludeSubfolders',true,'LabelSource','foldernames');
 imds.ReadFcn = @(x)imresize(imread(x),[64 64]);
@@ -19,7 +10,6 @@ trainQuota=0.85;
 aug = imageDataAugmenter("RandXReflection",true);
 imageSize = [64 64 1];
 auimds = augmentedImageDatastore(imageSize,imdsTrain,'DataAugmentation',aug);
-
 
 
 layers = [
@@ -67,8 +57,9 @@ layers = [
     classificationLayer('Name','output')
 ];
 
-lgraph = layerGraph(layers); % to run the layers need a name
-% analyzeNetwork(lgraph)
+lgraph = layerGraph(layers);
+analyzeNetwork(lgraph)
+
 InitialLearningRate = 0.001;
 options = trainingOptions('sgdm', ...
     'InitialLearnRate', InitialLearningRate, ...

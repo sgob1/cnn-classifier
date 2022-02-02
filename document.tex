@@ -56,7 +56,7 @@
 
 \section{Assignment general description}
 
-This project requires the implementation of an image classifier based on Convolutional Neural Networks. The provided dataset (from [Lazebnik et al., 2006]), contains 15 categories (office, kitchen, living room, bedroom, store, industrial, tall building, inside city, street, highway, coast, open country, mountain, forest, suburb), and is already divided in training set and test set.
+This project requires the implementation of an image classifier based on Convolutional Neural Networks. The provided dataset\cite{dataset-url}, contains 15 categories (office, kitchen, living room, bedroom, store, industrial, tall building, inside city, street, highway, coast, open country, mountain, forest, suburb), and is already divided in training set and test set.
 
 
 \section{Goal of this paper}
@@ -156,7 +156,7 @@ trainQuota=0.85;
 [imdsTrain, imdsValidation] = splitEachLabel(imds, trainQuota, 'randomize');
 \end{lstlisting}
 
-These instructions were sufficient to obtain two, distinct, datasets \--- the first one for training, the second one for validation. Images should be elected and put in the datasets according to a random process; despite that, \texttt{splitEachLabel} function should assure that the same quota of $0.85$ for training sets has been maintained across all $15$ labels.
+These instructions were sufficient to obtain two, distinct, datasets \--- the first one for training, the second one for validation. Images should be elected and put in the datasets according to a random process.
 
 \subsection{Resizing images}
 
@@ -365,7 +365,7 @@ plotconfusion(YTest,YPredicted)
         \label{fig:baseline-confusion}
 \end{figure}
 
-The confusion matrix shows that there are some classes that are more often misclassified (\emph{Kitchen}, \emph{Industrial}, \emph{Bedroom}, \emph{Forest}) and some classes that instead are less often misclassified, such as \emph{Coast}, \emph{Highway}, \emph{Office}, \emph{Street} and \emph{Suburb}. Overall accuracy stands at the value $28.9\%$: from this point of view, the baseline should represent an improvement from a completely random classifier, whose performance with respect to this classification task is less than~a~$7\%$.
+The confusion matrix shows that there are some classes that are more often misclassified (\emph{Kitchen}, \emph{Industrial}, \emph{Bedroom}, \emph{Forest}, \emph{LivingRoom}) and some classes that instead are less often misclassified, such as \emph{Coast}, \emph{Highway}, \emph{Office}, \emph{Street} and \emph{Suburb}. Overall accuracy stands at the value $30.6\%$: from this point of view, the baseline should represent an improvement from a completely random classifier, whose performance with respect to this classification task is less than~a~$7\%$.
 
 The overall code of the baseline network can be read in \texttt{baseline\_network.m} file.
 
@@ -373,13 +373,13 @@ The overall code of the baseline network can be read in \texttt{baseline\_networ
 
 \section{Improving the network}\label{sec:improved-network}
 
-The students propose (and have implemented) various methods in order to almost double the performance of the Convolutional Neural Network from the baseline $\sim 30\%$ to a $60\%$:
 
+The students propose (and have implemented) various methods in order to almost double the performance of the Convolutional Neural Network from the baseline $\sim 30\%$ to a $\sim 60\%$:
 \begin{enumerate}
     \item \emph{data augmentation};
     \item addition of \emph{batch normalization layers};
     \item changing the \emph{size of the convolutional filters};
-    \item modifying network layout;
+    \item modifying network layout.
 \end{enumerate}
 
 Individual contribution and net improvement of each of these methods is not investigated \--- what is provided, instead, is a description of each technique's implementation along with the necessary details, a brief description of the increasing improvements \emph{at each new addition} and a final overview of all improvements altogether with respect to the baseline.
@@ -831,9 +831,14 @@ The students implemented a total of $5$ notable Convolutional Neural Networks,
     \item a network implementing \textbf{transfer learning} by extracting activations of the last convolutional layer of AlexNet and training a SVM (Section~\ref{sec:transfer-learning-2}).
 \end{enumerate}
 
-The first $3$ networks of the list were built from scratch: this means that everything \--- from layer selection to training \--- were completely written by the students (however, the first baseline network has been subjected to strict requirements by the Teacher). The baseline network mainly served as a comparison and a starting point. The improved network almost doubled the accuracy of the baseline network, by only implementing some crucial changes (notably, data augmentation and addition of batch normalization layers were enough to improve drastically the performance of the network. Subsequent improvements refined the learning phase and granted enough benefits to double the performance of the baseline). Then, the improved network was adopted to build an ensemble network composed of $5$ and more of those networks. Each network was asked to classify an image; the output of the ensemble network was the most commonly predicted class. The approach granted an accuracy improvement of $4.17\%$ and much more stability of the results in the case of the improved network. The best network out of the $3$ first implemented by the students has been the ensemble network \--- however, the training time has been significantly increased by the necessity of learning multiple networks one after another.
+The baseline network mainly served as a comparison and a starting point. The improved network almost doubled the accuracy of the baseline network, by only implementing some crucial changes (notably, data augmentation and addition of batch normalization layers were enough to improve drastically the performance of the network. Subsequent improvements refined the learning phase and granted enough benefits to double the performance of the baseline). Then, the improved network was adopted to build an ensemble network composed of $5$ and more of those networks. Each network was asked to classify an image; the output of the ensemble network was the most commonly predicted class. The approach granted an accuracy improvement of $4.17\%$ and much more stability of the results in the case of the improved network. The best network out of the $3$ first implemented by the students has been the ensemble network \--- however, the training time has been significantly increased by the necessity of learning multiple networks one after another.
 
-The last $2$ networks of the list were not built from scratch by the students; on contrary, the group started from a pre-trained network (AlexNet) and only implemented the last portion of it, along with the testing apparatus. The first approach was by substituting the last layers with the last ones from the improved network; the second approach, instead, simply extracted features from the last convolutional layer and trained a SVM for classification. By adopting a well-established network, both approaches ended up being successful, with a test set accuracy of, respectively, $86.4\%$ and $87.6\%$. Those two networks fully outclassed the previous ones, showing that the transfer learning approach is not only feasible, but could be a valid and quick technique to obtain a high-performance Convolutional Neural Network.
+For the last $2$ networks of the list, the group started from a pre-trained network (AlexNet) and only implemented the last portion of it, along with the testing apparatus. The first approach was by substituting the last layers with the last ones from the improved network; the second approach, instead, extracted features from the last convolutional layer and trained a SVM for classification. By adopting a well-established network, both approaches ended up being successful, with a test set accuracy of, respectively, $86.4\%$ and $87.6\%$. Those two networks fully outclassed the previous ones, showing that the transfer learning approach is not only feasible, but could be a valid and quick technique to obtain a high-performance Convolutional Neural Network.
 
+\clearpage
+\addcontentsline{toc}{chapter}{References}
+\begin{thebibliography}{9}
+        \bibitem{dataset-url} [Lazebnik et al., 2006] Lazebnik, S., Schmid, C., and Ponce, J. (2006). Beyond bags of features: Spatial pyramid matching for recognizing natural scene categories. In 2006 IEEE Computer Society Conference on Computer Vision and Pattern Recognition (CVPR’06), volume 2, pages 2169–2178.
+\end{thebibliography}
 
 \end{document}

@@ -43,7 +43,7 @@ layers = [
     classificationLayer('Name','output')
 ];
 
-lgraph = layerGraph(layers); % to run the layers need a name
+lgraph = layerGraph(layers);
 analyzeNetwork(lgraph)
 InitialLearningRate = 0.001;
 options = trainingOptions('sgdm', ...
@@ -69,5 +69,3 @@ accuracy = sum(YPredicted == YTest)/numel(YTest);
 
 figure
 plotconfusion(YTest,YPredicted)
-
-

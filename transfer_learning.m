@@ -10,7 +10,6 @@ imageSize = [227 227 3];
 auimds = augmentedImageDatastore(imageSize,imdsTrain,'DataAugmentation',aug);
 
 net = alexnet;
-%analyzeNetwork(net);
 
 inputSize = net.Layers(1).InputSize;
 
@@ -28,8 +27,8 @@ layers = [
 
 layers(1:end-3) = freezeWeights(layers(1:end-3));
 
-lgraph = layerGraph(layers); % to run the layers need a name
-%analyzeNetwork(lgraph)
+lgraph = layerGraph(layers); 
+analyzeNetwork(lgraph)
 
 options = trainingOptions('sgdm', ...
     'MiniBatchSize',10, ...
